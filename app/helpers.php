@@ -146,6 +146,14 @@ if (!function_exists('supabase_url')) {
         $projectId = config('services.supabase.project_id');
         $bucket = config('services.supabase.bucket', 'kb-storage');
 
+        // Prioritas 0: berkas yang dikirim bersama aplikasi (mis. foto dan dokumen contoh di public/)
+        $bundled = ltrim($path, '/');
+        if (str_starts_with($bundled, 'assets/') || str_starts_with($bundled, 'demo/')) {
+            if (file_exists(public_path($bundled))) {
+                return url('/' . $bundled);
+            }
+        }
+
         // Prioritas 1: Cek local storage dulu untuk backward compatibility
         // File path yang ada di public disk biasanya relative path
         $publicStoragePath = storage_path('app/public/' . $path);

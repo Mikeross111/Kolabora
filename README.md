@@ -140,7 +140,16 @@ AI sebagai **fitur produk** (Kora, verifikasi dokumen, saran proyek) dijelaskan 
 
 ## Akun Demo
 
-Akun demo dibuat oleh seeder (`php artisan db:seed`; lihat `database/seeders`) dan kredensial untuk juri dicantumkan di dokumen proposal sesuai ketentuan kompetisi.
+Akun demo dibuat otomatis oleh `DemoSeeder` setiap deploy pertama (data referensi oleh `ReferenceDataSeeder`). Semua akun memakai password `Kolabora#2026`.
+
+| Peran | Email | Username |
+| --- | --- | --- |
+| Mahasiswa | mahasiswa@kolabora.test | mahasiswa |
+| Instansi (terverifikasi) | instansi@kolabora.test | instansi |
+| Perusahaan | perusahaan@kolabora.test | perusahaan |
+| Admin | admin@kolabora.test | admin |
+
+Seluruh data demo bersifat fiktif dan dibuat oleh seeder (bukan pengguna atau instansi sungguhan), dengan tanggal tersebar selama sekitar sebulan terakhir agar platform terlihat berjalan. Isinya: 40 mahasiswa, 12 instansi, 8 perusahaan, 47 masalah KKN (28 terbuka untuk dilamar, 7 berjalan, 12 selesai), lamaran dalam berbagai status, proyek beserta milestone, laporan, dan ulasan, 12 dokumen laporan akhir contoh di Repositori, 26 lowongan dengan pelamar, pertemanan, dan notifikasi. Foto masalah memakai foto dari `public/assets/photography` (sumber dan lisensi di `credits.json`).
 
 ## Referensi
 
