@@ -1,0 +1,61 @@
+# Render "Blueprint". Di dashboard Render: New > Blueprint > pilih repo ini > Render membaca file ini otomatis.
+# Variabel bertanda sync:false HARUS kamu isi manual di dashboard Render (bukan di sini, biar tidak ke-commit).
+services:
+  - type: web
+    name: kolabora
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Kolabora
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        sync: false   # isi setelah Render memberi URL, contoh: https://kolabora.onrender.com
+      - key: APP_KEY
+        sync: false   # isi hasil: php artisan key:generate --show (jalankan di lokal)
+      - key: LOG_CHANNEL
+        value: stack
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      # --- database (Supabase, mode Session pooler, port 5432) ---
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: postgres
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+      # --- Supabase Storage ---
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_PROJECT_ID
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: kb-storage
+      # --- AI ---
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: COHERE_API_KEY
+        sync: false
