@@ -80,7 +80,7 @@ class DummyDataSeeder extends Seeder
     /**
      * seeding universities (120+ universitas dari seluruh Indonesia)
      */
-    private function seedUniversities(): void
+    public function seedUniversities(): void
     {
         echo "seeding universities...\n";
         

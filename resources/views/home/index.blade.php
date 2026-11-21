@@ -246,11 +246,13 @@
                 <span class="kb-home-step__num kb-home-step__num--above" aria-hidden="true">2</span>
                 <h3 class="kb-home-step__title">Kirim lamaran</h3>
                 <p>Satu formulir per masalah. Instansi meninjau lamaran yang masuk.</p>
-                <dl class="kb-home-step__sample">
+                <div class="kb-home-step__sample">
                     <span class="kb-home-step__sample-label">Yang diisi</span>
-                    <div><dt>Motivasi</dt><dd>minimal 100 karakter</dd></div>
-                    <div><dt>Proposal</dt><dd>opsional, PDF/DOC/DOCX, maks. 5 MB</dd></div>
-                </dl>
+                    <dl class="kb-home-step__fields">
+                        <div><dt>Motivasi</dt><dd>minimal 100 karakter</dd></div>
+                        <div><dt>Proposal</dt><dd>opsional, PDF/DOC/DOCX, maks. 5 MB</dd></div>
+                    </dl>
+                </div>
             </div>
             <div class="kb-home-step">
                 <h3 class="kb-home-step__title">Kerjakan dan catat</h3>

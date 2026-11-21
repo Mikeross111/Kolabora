@@ -18,6 +18,7 @@ fi
 
 php artisan config:clear
 php artisan migrate --force
+php artisan db:seed --class=ReferenceDataSeeder --force || echo "PERINGATAN: seeder data referensi gagal, lanjut start."
 
 php artisan config:cache
 php artisan route:cache
