@@ -1,0 +1,145 @@
+/*
+ * Kolabora — Phase 8 (2026-10-31): student project discovery (/student/browse-problems).
+ *
+ * Imported by app.css after student-dashboard.css (its own file, so it never
+ * collides with the shared component file or the parallel institution/company
+ * work). Existing tokens only: no new colour, font, radius or shadow. Workbench
+ * layer: filter panel at left (drawer below 1024 px), a table of problems as the
+ * default view, an optional card gallery (media only when a real image loads)
+ * and the existing Leaflet map. Documented in COMPONENT_INVENTORY.md section 10.
+ */
+
+.kb-browse { padding-bottom: 4rem; }
+.kb-browse__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+@media (min-width: 1024px) { .kb-browse__layout { grid-template-columns: 15.5rem minmax(0, 1fr); gap: 2rem; align-items: start; } }
+.kb-browse__main { min-width: 0; container: kb-browse-main / inline-size; }
+
+/* ── Toolbar: one search (+ Cari), sort, filter toggle below 1024 px ── */
+.kb-browse__toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem 1rem; }
+.kb-browse__search { display: flex; align-items: flex-end; gap: .5rem; flex: 1 1 20rem; min-width: 0; }
+.kb-browse__search > .kb-field { flex: 1; min-width: 0; }
+.kb-browse__sort { display: flex; align-items: center; gap: .5rem; }
+.kb-browse__sort .kb-select { width: auto; }
+.kb-browse__filter-toggle { display: none; }
+@media (max-width: 1023px) { .kb-browse__filter-toggle { display: inline-flex; } }
+
+/* ── Active filters: removable chips (links), 'Hapus semua filter' ── */
+.kb-browse__active { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: 1rem; }
+.kb-browse__chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.kb-browse-chip { display: inline-flex; align-items: center; gap: .375rem; min-height: 2rem; padding: .25rem .5rem .25rem .625rem; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-primary); text-decoration: none; overflow-wrap: anywhere; background: var(--kb-surface-raised); border: 1px solid var(--kb-border-strong); border-radius: var(--radius-sm); transition: background-color var(--duration-state) var(--ease-standard), border-color var(--duration-state) var(--ease-standard); }
+.kb-browse-chip:hover { background: var(--kb-brand-tint); border-color: var(--kb-brand); }
+.kb-browse-chip .kb-icon { color: var(--kb-text-secondary); }
+.kb-browse__clear { display: inline-flex; align-items: center; min-height: 1.5rem; font: 500 .875rem/1.25rem var(--font-sans); color: var(--kb-text-link); text-decoration: none; }
+.kb-browse__clear:hover { text-decoration: underline; }
+@media (pointer: coarse) { .kb-browse-chip, .kb-browse__clear { min-height: 2.75rem; } }
+
+/* ── Result count + view switch (List / Galeri / Peta, role=tablist) ── */
+.kb-browse__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem; margin-block: 1rem .75rem; }
+.kb-browse__count { margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-browse__count b { font-weight: 600; color: var(--kb-text-primary); font-variant-numeric: tabular-nums; }
+.kb-browse-views { display: inline-flex; border: 1px solid var(--kb-border-strong); border-radius: var(--kb-radius-control); overflow: hidden; }
+.kb-browse-views__tab { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.25rem; padding: .375rem .75rem; font: 500 .875rem/1.25rem var(--font-sans); color: var(--kb-text-secondary); background: var(--kb-surface-raised); border: 0; border-left: 1px solid var(--kb-border-default); cursor: pointer; transition: background-color var(--duration-state) var(--ease-standard), color var(--duration-state) var(--ease-standard); }
+.kb-browse-views__tab:first-child { border-left: 0; }
+.kb-browse-views__tab:hover { background: var(--color-gray-50); color: var(--kb-text-primary); }
+.kb-browse-views__tab[aria-selected="true"] { background: var(--kb-brand-tint); color: var(--kb-text-link); font-weight: 600; }
+.kb-browse-views__tab:focus-visible { outline-offset: -2px; }
+@media (pointer: coarse) { .kb-browse-views__tab { min-height: 2.75rem; } }
+
+/* ── Filter panel: sidebar from 1024 px (auto-apply), drawer below with sticky Terapkan ── */
+.kb-browse-filters { background: var(--kb-surface-raised); border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); }
+.kb-browse-filters__head { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--kb-border-default); }
+.kb-browse-filters__head h2 { flex: 1; margin: 0; font: 600 1rem/1.5rem var(--font-sans); color: var(--kb-text-primary); }
+.kb-browse-filters__close { display: none; }
+.kb-browse-filters__body { display: grid; gap: 1rem; padding: 1rem; }
+.kb-browse-filters__group { display: grid; gap: 1rem; }
+.kb-browse-filters__details > summary { display: flex; align-items: center; gap: .5rem; min-height: 2.5rem; font: 500 .875rem/1.25rem var(--font-sans); color: var(--kb-text-primary); cursor: pointer; list-style: none; }
+.kb-browse-filters__details > summary::-webkit-details-marker { display: none; }
+.kb-browse-filters__details > summary .kb-chevron { margin-left: auto; color: var(--kb-text-tertiary); }
+.kb-browse-filters__details[open] > summary .kb-chevron { transform: rotate(180deg); }
+.kb-browse-filters__badge { font-size: .75rem; line-height: 1rem; font-weight: 500; color: var(--kb-text-tertiary); font-variant-numeric: tabular-nums; }
+.kb-browse-filters__checks { display: grid; gap: .5rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+.kb-browse-filters__details .kb-browse-filters__checks { padding-top: .25rem; }
+.kb-browse-filters__checks > legend.kb-label { margin-bottom: .5rem; padding: 0; }
+.kb-browse-filters__foot { display: none; }
+.kb-browse-filters__backdrop { display: none; }
+
+@media (min-width: 1024px) {
+  .kb-browse-filters { position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow-y: auto; }
+}
+@media (max-width: 1023px) {
+  .kb-browse-filters { display: none; position: fixed; z-index: 80; top: 0; right: 0; bottom: 0; width: min(22rem, 100%); flex-direction: column; border: 0; border-radius: 0; box-shadow: var(--shadow-overlay); }
+  .kb-browse-filters[data-open] { display: flex; }
+  .kb-browse-filters__backdrop[data-open] { display: block; position: fixed; inset: 0; z-index: 79; background: color-mix(in srgb, var(--color-gray-900) 45%, transparent); }
+  .kb-browse-filters__close { display: inline-flex; }
+  .kb-browse-filters__reset { display: none; }
+  .kb-browse-filters__body { flex: 1; overflow-y: auto; }
+  .kb-browse-filters__foot { display: flex; gap: .5rem; position: sticky; bottom: 0; padding: .75rem 1rem; background: var(--kb-surface-raised); border-top: 1px solid var(--kb-border-default); }
+  .kb-browse-filters__foot > .kb-btn { flex: 1; }
+}
+
+/* ── List (default): shared table, full institution names, stacked below 640 px ── */
+/* words break only when a single word is longer than the cell (never letter by letter) */
+.kb-browse-table td { overflow-wrap: break-word; }
+@media (min-width: 640px) {
+  .kb-browse-table { background: var(--kb-surface-raised); }
+  .kb-browse-table th:nth-child(1) { width: 32%; }
+  .kb-browse-table th:nth-child(2) { width: 22%; }
+  .kb-browse-table th:nth-child(3) { min-width: 8.5rem; }
+}
+/* Lokasi, Kuota, Tenggat and Kesulitan need ~460 px; below a 50rem results column (640-850 px
+   without the sidebar, 1024-1150 px with it) the title column was squeezed to ~80 px, so the rows
+   stack there too, with the same rules x-ui.table uses below 640 px (components.css) */
+@container kb-browse-main (max-width: 49.999rem) {
+  .kb-browse-table.kb-table-wrap { border: 0; overflow: visible; }
+  .kb-browse-table .kb-table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .kb-browse-table .kb-table--stack tr { display: block; padding: .75rem 0; border-bottom: 1px solid var(--kb-border-default); }
+  .kb-browse-table .kb-table--stack td { display: grid; grid-template-columns: 7rem minmax(0, 1fr); column-gap: .5rem; padding: .25rem 0; border: 0; }
+  .kb-browse-table .kb-table--stack td::before { content: attr(data-label); grid-column: 1; grid-row: 1; font-size: .75rem; line-height: 1.25rem; color: var(--kb-text-tertiary); }
+  .kb-browse-table .kb-table--stack td > * { grid-column: 2; }
+  .kb-browse-table .kb-table--stack tbody tr:hover { background: transparent; }
+}
+.kb-browse-row { display: grid; gap: .375rem; justify-items: start; }
+.kb-browse-table .kb-browse-row__title { display: inline-block; min-height: 1.5rem; font-weight: 600; color: var(--kb-text-primary); overflow-wrap: break-word; }
+.kb-browse-table .kb-browse-row__title:hover { color: var(--kb-text-link); }
+.kb-browse-row__flags { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin: 0; }
+.kb-browse-flag { display: inline-flex; align-items: center; gap: .25rem; font: 600 .75rem/1rem var(--font-sans); color: var(--kb-text-secondary); }
+.kb-browse-row__sdgs { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0; padding: 0; list-style: none; }
+.kb-browse-row__sdgs .kb-chip { overflow-wrap: break-word; }
+.kb-browse-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kb-browse-table .kb-meter { white-space: nowrap; }
+.kb-browse-table__sort { display: inline-flex; align-items: center; gap: .25rem; min-height: 1.5rem; }
+.kb-table .kb-browse-table__sort { color: inherit; font-weight: 500; }
+.kb-browse-table th[aria-sort] .kb-browse-table__sort { color: var(--kb-text-link); font-weight: 600; }
+
+/* ── Gallery (optional): cards, media only when a real image loads (x-ui.card) ── */
+.kb-browse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.kb-browse-grid > li { display: flex; min-width: 0; }
+.kb-browse-card { width: 100%; }
+.kb-browse-card .kb-card__title { overflow-wrap: anywhere; }
+.kb-browse-card .kb-card__title a { display: inline-block; min-height: 1.5rem; }
+.kb-browse-card__by { margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); overflow-wrap: anywhere; }
+.kb-browse-card__facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .25rem .75rem; margin: 0; font-size: .875rem; line-height: 1.25rem; }
+.kb-browse-card__facts > div { display: contents; }
+.kb-browse-card__facts dt { color: var(--kb-text-tertiary); }
+.kb-browse-card__facts dd { margin: 0; color: var(--kb-text-primary); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+/* ── Map (AD-08): Leaflet kept; package pin; contained stacking so the sticky header stays on top ── */
+.kb-browse-map { position: relative; overflow: hidden; background: var(--kb-surface-raised); border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); }
+.kb-browse-map__canvas { position: relative; z-index: 0; isolation: isolate; height: 37.5rem; }
+@media (max-width: 639px) { .kb-browse-map__canvas { height: max(22rem, 70vh); } }
+.kb-browse-map__note { margin: 0; padding: .5rem .75rem; font-size: .75rem; line-height: 1rem; color: var(--kb-text-tertiary); border-top: 1px solid var(--kb-border-default); }
+.kb-browse-map__loading { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; background: var(--kb-surface-sunken); }
+.kb-browse-pin { background: none; border: 0; }
+.kb-browse-pin img { display: block; width: 28px; height: 38px; }
+.kb-browse-map .leaflet-marker-icon:focus-visible { outline: 2px solid var(--kb-focus); outline-offset: 2px; }
+.kb-browse-cluster { display: grid; place-items: center; font: 600 .875rem/1 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--kb-text-on-brand); background: var(--kb-brand); border: 2px solid var(--kb-surface-raised); border-radius: var(--radius-sm); }
+.kb-browse-popup .leaflet-popup-content-wrapper { border-radius: var(--kb-radius-panel); box-shadow: var(--shadow-overlay); }
+.kb-browse-popup .leaflet-popup-content { margin: .75rem .875rem; font-family: var(--font-sans); }
+.kb-browse-popup__body { display: grid; gap: .25rem; }
+.kb-browse-popup__title { margin: 0; font: 600 .9375rem/1.375rem var(--font-sans); color: var(--kb-text-primary); overflow-wrap: anywhere; }
+.kb-browse-popup__meta { margin: 0; font-size: .8125rem; line-height: 1.25rem; color: var(--kb-text-secondary); overflow-wrap: anywhere; }
+.kb-browse-popup .kb-btn { margin-top: .5rem; color: var(--kb-text-primary); }
+
+/* ── Empty states and pager ── */
+.kb-browse__empty { max-width: none; margin: 0; padding: 2.5rem 1rem; background: var(--kb-surface-raised); border: 1px dashed var(--kb-border-strong); border-radius: var(--kb-radius-panel); }
+.kb-browse__pager { margin-top: 1.25rem; }

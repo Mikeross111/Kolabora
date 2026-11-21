@@ -1,0 +1,88 @@
+/*
+ * Kolabora — Phase 14 (2026-10-31): knowledge repository (/student/repository, /student/repository/{id}).
+ *
+ * Imported by app.css after student-brief.css (its own file; existing tokens only, plus the 17 official SDG
+ * colours, used only as 8 px swatches beside the goal name). Workbench layer: page header, one prominent
+ * search with the filters (SDG, provinsi, tahun, urutan) above a six-column library table that stacks below
+ * 640 px. Catatan Lapangan only in the detail page's abstract (serif reading column, <= 68ch).
+ */
+
+.kb-repo { padding-bottom: 4rem; }
+
+/* ── Search first: full-width search row, filters below it ── */
+.kb-repo__filters .kb-filter-bar__search { flex: 1 1 100%; }
+.kb-repo__filters .kb-filter-bar__search .kb-input { min-height: 2.75rem; font-size: 1rem; line-height: 1.5rem; }
+@media (min-width: 768px) {
+  .kb-repo__filters .kb-filter-bar__body > .kb-field { flex: 1 1 11rem; }
+  .kb-repo__filters .kb-filter-bar__body > .kb-repo__sdg { flex: 2 1 16rem; }
+}
+
+/* ── Result count ("N dokumen" / "N dari M dokumen") ── */
+.kb-repo__count { margin: 1.25rem 0 .75rem; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-repo__count b { font-weight: 600; color: var(--kb-text-primary); font-variant-numeric: tabular-nums; }
+
+/* ── Library table: Judul · Instansi · Wilayah · Tahun · Dilihat · Diunduh ── */
+.kb-repo-table-wrap th:first-child { width: 40%; }
+.kb-repo-table-wrap .kb-num { font-variant-numeric: tabular-nums; }
+/* nama wilayah/instansi tidak dipotong di tengah kata (tabel bersama memakai overflow-wrap: anywhere) */
+.kb-repo-table-wrap td[data-label="Instansi"], .kb-repo-table-wrap td[data-label="Wilayah"] { overflow-wrap: break-word; }
+@media (min-width: 640px) { .kb-repo-table-wrap th:nth-child(3) { min-width: 8.5rem; } }
+.kb-repo-row { display: grid; gap: .375rem; min-width: 0; }
+.kb-repo-row__title { display: inline-block; min-height: 1.5rem; overflow-wrap: break-word; }
+.kb-repo-row__meta { display: flex; flex-wrap: wrap; gap: .375rem; margin: 0; padding: 0; list-style: none; }
+.kb-repo-row__meta .kb-chip { white-space: normal; }
+.kb-repo-file { font-variant-numeric: tabular-nums; }
+@media (max-width: 639px) {
+  /* judul memakai lebar penuh kartu bertumpuk; label kolom lain tetap */
+  .kb-repo-table-wrap .kb-table--stack td:first-child { display: block; padding-bottom: .5rem; }
+  .kb-repo-table-wrap .kb-table--stack td:first-child::before { display: none; }
+}
+
+/* ── SDG swatch: warna resmi hanya sebagai kotak 8 px di samping nama ── */
+.kb-sdg[data-sdg="1"]  { --kb-swatch: #e5243b; }
+.kb-sdg[data-sdg="2"]  { --kb-swatch: #dda63a; }
+.kb-sdg[data-sdg="3"]  { --kb-swatch: #4c9f38; }
+.kb-sdg[data-sdg="4"]  { --kb-swatch: #c5192d; }
+.kb-sdg[data-sdg="5"]  { --kb-swatch: #ff3a21; }
+.kb-sdg[data-sdg="6"]  { --kb-swatch: #26bde2; }
+.kb-sdg[data-sdg="7"]  { --kb-swatch: #fcc30b; }
+.kb-sdg[data-sdg="8"]  { --kb-swatch: #a21942; }
+.kb-sdg[data-sdg="9"]  { --kb-swatch: #fd6925; }
+.kb-sdg[data-sdg="10"] { --kb-swatch: #dd1367; }
+.kb-sdg[data-sdg="11"] { --kb-swatch: #fd9d24; }
+.kb-sdg[data-sdg="12"] { --kb-swatch: #bf8b2e; }
+.kb-sdg[data-sdg="13"] { --kb-swatch: #3f7e44; }
+.kb-sdg[data-sdg="14"] { --kb-swatch: #0a97d9; }
+.kb-sdg[data-sdg="15"] { --kb-swatch: #56c02b; }
+.kb-sdg[data-sdg="16"] { --kb-swatch: #00689d; }
+.kb-sdg[data-sdg="17"] { --kb-swatch: #19486a; }
+.kb-sdg .kb-chip__swatch { flex: none; }
+
+/* ── Detail: catalogue page (abstract + related at left, record metadata at right from 1024 px) ── */
+.kb-repo-doc__head h1 { overflow-wrap: break-word; }
+.kb-repo-doc__head .kb-breadcrumb a { display: inline-block; min-height: 1.5rem; }
+.kb-repo-doc__actions { flex-wrap: wrap; }
+.kb-repo-doc__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+.kb-repo-doc__layout > * { min-width: 0; }
+@media (min-width: 1024px) {
+  .kb-repo-doc__layout { grid-template-columns: minmax(0, 1fr) 20rem; grid-template-rows: auto 1fr; grid-template-areas: "abstract record" "related record"; column-gap: 3rem; align-items: start; }
+  .kb-repo-doc__abstract-section { grid-area: abstract; }
+  .kb-repo-doc__record { grid-area: record; }
+  .kb-repo-related { grid-area: related; }
+}
+.kb-repo-doc__section h2 { margin: 0 0 .75rem; font-size: 1.125rem; line-height: 1.75rem; }
+.kb-repo-doc__abstract { margin: 0; }
+.kb-repo-doc__none { margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-repo-doc__sdgs { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.kb-repo-doc__sdgs .kb-chip { white-space: normal; font-size: .875rem; line-height: 1.25rem; }
+
+/* metadata rekaman di panel bergaris (tanpa bayangan) */
+.kb-repo-doc__record h2 { margin: 0 0 1rem; font-size: 1rem; line-height: 1.5rem; }
+.kb-repo-doc__record .kb-dl dd { overflow-wrap: break-word; }
+.kb-repo-doc__record .kb-dl .kb-num { font-variant-numeric: tabular-nums; }
+
+/* dokumen terkait: daftar bergaris pemisah, bukan kartu */
+.kb-repo-related .kb-list > li { display: grid; gap: .125rem; padding-block: .75rem; }
+.kb-repo-related a { display: inline-block; min-height: 1.5rem; font-weight: 500; color: var(--kb-text-link); text-decoration: none; overflow-wrap: break-word; }
+.kb-repo-related a:hover { text-decoration: underline; }
+.kb-repo-related__meta { margin: 0; font-size: .75rem; line-height: 1rem; color: var(--kb-text-tertiary); }

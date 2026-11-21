@@ -1,0 +1,97 @@
+/* ════════════════════════════════════════════════════════════════════
+ * Homepage hero with a looping background video (AD-11, 2026-10-31).
+ * Pattern: full-window moving background, transparent header over it,
+ * one large white headline at the lower left.
+ * Kept in its own file (imported after components.css) so it can be
+ * reviewed apart from the Phase 4 revision. Tokens: tokens.css
+ * (--kb-on-media*, --kb-hero-*). One scrim for legibility only: no other
+ * gradient, no glass, no blur; motion is the 200ms poster fade, which the
+ * global reduced-motion rule turns off.
+ * ════════════════════════════════════════════════════════════════════ */
+
+.kb-hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex;
+  min-height: clamp(560px, 100vh, 880px);
+  min-height: clamp(560px, 100svh, 880px);
+  background: var(--kb-hero-ground);
+  color: var(--kb-on-media);
+  --kb-focus: var(--kb-on-media);           /* 2px white ring, 2px offset (base rule) */
+}
+
+/* media: video underneath, poster on top until the video plays */
+.kb-hero__media, .kb-hero__scrim { position: absolute; inset: 0; }
+.kb-hero__media { z-index: -2; }
+.kb-hero__video, .kb-hero__poster {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: cover; object-position: 70% 50%;   /* keep the archipelago in view on narrow desktops */
+}
+@media (max-width: 767px) { .kb-hero__video, .kb-hero__poster { object-position: 50% 50%; } }
+.kb-hero__poster { transition: opacity 200ms var(--ease-standard); }
+.kb-hero.has-video .kb-hero__poster { opacity: 0; }
+
+.kb-hero__scrim {
+  z-index: -1;
+  background:
+    linear-gradient(to top right, var(--kb-hero-scrim-deep), transparent 70%),
+    linear-gradient(to bottom left, var(--kb-hero-scrim-tint), transparent 60%),
+    var(--kb-hero-scrim);
+}
+
+/* content: lower left, inside the normal container */
+.kb-hero__inner {
+  position: relative;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-top: 6rem;                                            /* clears the 4rem header */
+  padding-bottom: clamp(3rem, 9vh, 6rem);
+}
+.kb-hero__content { max-width: 52rem; }
+.kb-hero__title {
+  margin: 0; max-width: 20ch;
+  font: 700 clamp(2rem, 1.2rem + 3.2vw, 3.75rem)/1.08 var(--font-sans);
+  letter-spacing: -0.02em; text-wrap: balance;
+  color: var(--kb-on-media);
+}
+.kb-hero__lead {
+  margin: 1rem 0 0; max-width: 52ch;
+  font-size: clamp(1.125rem, 1.05rem + .25vw, 1.25rem); line-height: 1.6;
+  color: var(--kb-on-media-muted);
+}
+.kb-hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.kb-hero__actions:empty { display: none; }
+
+/* actions: 48px tall; white primary with navy text, outlined secondary */
+.kb-hero .kb-hero__btn { min-height: 3rem; padding-inline: 1.25rem; }
+.kb-hero .kb-hero__btn--primary { background: var(--kb-accent); color: var(--kb-accent-ink); border-color: var(--kb-accent); }
+.kb-hero .kb-hero__btn--primary:hover { background: #e0701c; border-color: #e0701c; }
+.kb-hero .kb-hero__btn--secondary { background: transparent; color: var(--kb-on-media); border-color: var(--kb-on-media-line); }
+.kb-hero .kb-hero__btn--secondary:hover { background: var(--kb-on-media-hover); border-color: var(--kb-on-media); }
+
+.kb-hero__sentinel { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; pointer-events: none; }
+
+/* the block that used to open the page now follows the hero */
+@media (max-width: 639px) { .kb-home-intro { padding-top: 2.5rem; } }
+
+/* ── Header over the hero (home route only; hero-video.js removes .is-over-hero) ── */
+/* the header is fixed on this page: anchor jumps and keyboard focus scroll below it, never under it (WCAG 2.4.11) */
+html:has(.kb-header--hero) { scroll-padding-top: 5rem; }
+.kb-header--hero {
+  position: fixed; inset-inline: 0; top: 0;
+  transition: background-color var(--duration-state) var(--ease-standard), border-color var(--duration-state) var(--ease-standard);
+}
+/* specificity must beat .kb-header__brand img (display:block) or both logos show at once */
+.kb-header__brand .kb-header__logo-on-dark { display: none; }
+.kb-header--hero.is-over-hero:not(.is-menu-open) { background: transparent; border-bottom-color: transparent; }
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-header__brand .kb-header__logo { display: none; }
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-header__brand .kb-header__logo-on-dark { display: block; }
+.kb-header--hero.is-over-hero:not(.is-menu-open) :is(.kb-header__brand, .kb-nav__link, .kb-header__bar .kb-icon-btn, .kb-account__btn, .kb-header__desktop > .kb-btn--tertiary):not(.kb-overlay *) {
+  --kb-focus: var(--kb-on-media);
+  color: var(--kb-on-media);
+}
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-nav__link:hover { border-bottom-color: var(--kb-on-media-line); }
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-nav__link[aria-current="page"] { border-bottom-color: var(--kb-on-media); }
+.kb-header--hero.is-over-hero:not(.is-menu-open) :is(.kb-header__bar .kb-icon-btn, .kb-account__btn, .kb-header__desktop > .kb-btn--tertiary):not(.kb-overlay *):is(:hover, [aria-expanded="true"]) {
+  background: var(--kb-on-media-hover);
+}
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-header__desktop > .kb-btn--primary { --kb-focus: var(--kb-on-media); background: var(--kb-on-media); color: var(--kb-hero-ink); }
+.kb-header--hero.is-over-hero:not(.is-menu-open) .kb-header__desktop > .kb-btn--primary:hover { background: var(--color-brand-50); }

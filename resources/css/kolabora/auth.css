@@ -1,0 +1,124 @@
+/*
+ * Kolabora — Phase 6 (2026-10-31): authentication pages (/login, /register,
+ * /register/{student,institution,company}, /forgot-password, /reset-password,
+ * /email/verify).
+ *
+ * Imported by app.css after public-pages.css (its own file, so it never collides
+ * with edits to the shared component file). Existing tokens only: no new colour,
+ * font, radius or shadow. Workbench layer: white page, one contour side panel
+ * (>= 1024px, the page's only motif), divided rows instead of cards, no photo,
+ * no numbers. Documented in COMPONENT_INVENTORY.md section 8.
+ */
+
+.kb-auth-body { background: var(--kb-surface-page); color: var(--kb-text-primary); }
+
+/* ── Compact header: wordmark home + two public links ── */
+.kb-auth-header { background: var(--kb-surface-raised); border-bottom: 1px solid var(--kb-border-default); position: relative; }
+.kb-auth-header::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--kb-brand-stripe); }
+.kb-auth-header__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 4rem; padding-inline: var(--kb-gutter); }
+.kb-auth-header__brand { display: inline-flex; align-items: center; flex: none; border-radius: var(--radius-sm); }
+.kb-auth-header__brand img { display: block; height: 2.5rem; width: auto; }
+.kb-auth-header__nav { display: flex; align-items: center; gap: .125rem; }
+.kb-auth-header__nav a { display: inline-flex; align-items: center; min-height: 2.25rem; padding-inline: .625rem; font: 500 .875rem/1.25rem var(--font-sans); color: var(--kb-text-secondary); text-decoration: none; border-radius: var(--kb-radius-control); transition: color var(--duration-state) var(--ease-standard), background-color var(--duration-state) var(--ease-standard); }
+.kb-auth-header__nav a:hover { color: var(--kb-text-primary); background: var(--color-brand-50); }
+@media (pointer: coarse) { .kb-auth-header__nav a { min-height: 2.75rem; } }
+
+/* ── Frame: form column + optional contour panel ── */
+.kb-auth { display: grid; min-height: calc(100vh - 4rem); min-height: calc(100dvh - 4rem); }
+@media (min-width: 1024px) { .kb-auth--split { grid-template-columns: minmax(0, 1fr) minmax(22rem, 38%); } }
+.kb-auth__main { display: flex; align-items: flex-start; justify-content: center; min-width: 0; padding: 2rem var(--kb-gutter) 3rem; }
+.kb-auth__main:focus { outline: none; }                      /* target of the skip link only (tabindex -1), as .kb-main */
+@media (min-width: 640px) { .kb-auth__main { padding-block: 3rem 4rem; } }
+.kb-auth__body { width: 100%; min-width: 0; max-width: 25rem; }          /* 400px: sign-in, password, verification */
+.kb-auth__body--wide { max-width: 40rem; }                                /* 640px: role chooser and registration */
+@media (min-width: 640px) { .kb-auth__body:not(.kb-auth__body--wide) { margin-block: auto; } }
+.kb-auth__flash { margin-bottom: 1.25rem; }
+/* galat field: kalimat diawali huruf besar tanpa mengubah pesan server (phase 29 F, C5). ::first-letter tidak berlaku
+   pada flex atau setelah svg inline, jadi blok biasa dengan ikon di luar alur; indentasi gantung sama seperti flex */
+.kb-auth .kb-error { display: block; position: relative; padding-left: 1.375rem; }
+.kb-auth .kb-error > .kb-icon { position: absolute; left: 0; top: .125rem; }
+.kb-auth .kb-error::first-letter { text-transform: uppercase; }
+
+.kb-auth__aside { display: none; }
+@media (min-width: 1024px) {
+  .kb-auth__aside { display: block; border-left: 1px solid var(--kb-border-default); }
+  .kb-auth__aside-inner { position: sticky; top: 0; max-width: 30rem; padding: 3.5rem 2.5rem; }
+  /* text sits on the panel's plain ground; the contour lines show around it, never through it */
+  .kb-auth__aside-inner > * { position: relative; background: var(--kb-surface-sunken); outline: .75rem solid var(--kb-surface-sunken); }
+}
+@media (min-width: 1280px) { .kb-auth__aside-inner { padding-inline: 3.5rem; } }
+
+/* page header inside the auth column: the shared x-ui.page-header, without its top padding */
+.kb-auth .kb-page-header { padding-top: 0; }
+.kb-auth .kb-page-header h1 { text-wrap: balance; }
+
+/* ── Side panel content: one heading, divided rows (roles or what to prepare) ── */
+.kb-auth-aside__title { margin: 0; max-width: 22ch; font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.kb-auth-aside__lead { margin: .5rem 0 0; max-width: 40ch; font-size: .875rem; line-height: 1.375rem; color: var(--kb-text-secondary); }
+.kb-auth-aside__list { display: grid; margin: 1.5rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--kb-border-default); }
+.kb-auth-aside__list > li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .75rem; padding-block: .875rem; border-bottom: 1px solid var(--kb-border-default); font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-auth-aside__list strong { display: block; color: var(--kb-text-primary); font-weight: 600; }
+.kb-auth-aside__icon { display: inline-grid; place-items: center; width: 2rem; height: 2rem; color: var(--kb-brand); background: var(--kb-surface-raised); border: 1px solid var(--kb-border-default); border-radius: var(--radius-md); }
+.kb-auth-aside__note { margin: 1.25rem 0 0; max-width: 40ch; font-size: .875rem; line-height: 1.375rem; color: var(--kb-text-secondary); }
+
+/* ── Forms ── */
+.kb-auth-form { display: grid; gap: 1.25rem; }
+.kb-auth-form__row { display: grid; gap: 1.25rem; }
+@media (min-width: 640px) { .kb-auth-form__row--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kb-auth-form__inline { font-size: .875rem; line-height: 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
+.kb-auth-link { color: var(--kb-text-link); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+.kb-auth-link:hover { text-decoration-thickness: 2px; }
+.kb-auth-alt { margin: 1.75rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--kb-border-default); font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-auth-note { margin: 0; font-size: .875rem; line-height: 1.375rem; color: var(--kb-text-secondary); }
+.kb-auth-note ul { margin: .25rem 0 0; padding-left: 1.25rem; list-style: disc; }
+
+/* dropzone turns red only after interaction (same rule as inputs) */
+.kb-auth .kb-dropzone:has(input[data-touched][aria-invalid="true"]) { border-color: var(--color-danger-600); }
+
+/* ── Role chooser: three bordered rows (icon · name + main task · chevron) ── */
+.kb-role-list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); overflow: hidden; }
+.kb-role-list > li + li { border-top: 1px solid var(--kb-border-default); }
+.kb-role-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 1rem 1.25rem; color: var(--kb-text-primary); text-decoration: none; transition: background-color var(--duration-state) var(--ease-standard); }
+.kb-role-row:hover { background: var(--kb-brand-tint); }
+.kb-role-row:focus-visible { outline-offset: -2px; }
+.kb-role-row__icon { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; color: var(--kb-brand); background: var(--kb-surface-raised); border: 1px solid var(--kb-border-default); border-radius: var(--radius-md); }
+.kb-role-row__name { display: block; font-size: 1rem; line-height: 1.5rem; font-weight: 600; }
+.kb-role-row__desc { display: block; margin-top: .125rem; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-role-row__chev { color: var(--kb-text-tertiary); }
+.kb-role-row:hover .kb-role-row__chev { color: var(--kb-brand); }
+@media (max-width: 389px) { .kb-role-row { gap: .75rem; padding-inline: 1rem; } }
+
+/* ── Registration wizard (x-ui.stepper + one section per step) ── */
+.kb-wizard { display: grid; gap: 1.5rem; }
+.kb-wizard__stepper { padding-bottom: 1.25rem; border-bottom: 1px solid var(--kb-border-default); }
+.kb-wizard__step { display: grid; gap: 1.25rem; }
+.kb-wizard__head { display: grid; gap: .25rem; }
+.kb-wizard__title { margin: 0; font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; }
+.kb-wizard__title:focus { outline: none; }                    /* programmatic focus target (tabindex -1) when a step opens */
+.kb-wizard__desc { margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-wizard__group { display: grid; gap: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--kb-border-default); }
+.kb-wizard__group-title { margin: 0; font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--kb-text-primary); }
+.kb-wizard__actions { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: 1.25rem; border-top: 1px solid var(--kb-border-default); }
+.kb-wizard__actions > :only-child, .kb-wizard__actions > .kb-wizard__primary { margin-left: auto; }
+@media (max-width: 639px) {
+  .kb-wizard__actions { flex-direction: column-reverse; align-items: stretch; }
+  .kb-wizard__actions .kb-btn { width: 100%; }
+  .kb-wizard__actions > :only-child, .kb-wizard__actions > .kb-wizard__primary { margin-left: 0; }
+}
+.kb-wizard__summary:focus { outline: none; }
+.kb-wizard__summary a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* success panel after institution/company registration (replaces the old alert()) */
+.kb-auth-done { display: grid; gap: 1rem; padding: 1.5rem; border: 1px solid var(--color-success-600); border-radius: var(--kb-radius-panel); background: var(--color-success-50); }
+.kb-auth-done:focus { outline: none; }
+.kb-auth-done__title { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; }
+.kb-auth-done__title .kb-icon { color: var(--color-success-700); }
+.kb-auth-done p { margin: 0; font-size: .875rem; line-height: 1.375rem; color: var(--kb-text-primary); }
+.kb-auth-done__actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+/* province -> regency status line (aria-live) */
+.kb-auth-status { display: flex; align-items: center; gap: .5rem; min-height: 1.25rem; font-size: .75rem; line-height: 1rem; color: var(--kb-text-tertiary); }
+.kb-auth-status[data-state="error"] { color: var(--color-danger-700); }
+.kb-auth-status .kb-spinner { width: .75rem; height: .75rem; }
+.kb-wizard__content { display: contents; }                     /* hidden (x-show) once the success panel replaces the wizard */
+button.kb-auth-link { padding: 0; font: inherit; font-weight: 600; background: none; border: 0; cursor: pointer; }

@@ -1,0 +1,163 @@
+/*
+ * Kolabora — global overrides (staged in Phase 2; ACTIVE since Phase 3, 2026-10-30).
+ *
+ * D-29 (answered 2026-10-30, staged wiring). Everything in this file was moved
+ * unchanged from the package's tokens.css and components.css. These rules
+ * redefine Tailwind's default theme names (gray-*, font-sans, font-serif,
+ * text-*, tracking-tight, radius-*) or style bare elements (html, body, h1-h4,
+ * :focus-visible, reduced motion), so they change every existing page at once.
+ * Phase 2 must not change existing pages; Phase 3 activates this file together
+ * with the new shell by un-commenting its @import in resources/css/app.css.
+ *
+ * Rule used for the split: a token whose name is a Tailwind default theme
+ * variable, or a selector that matches plain elements, lives here. Tokens in
+ * the Kolabora namespaces (brand-*, earth-*, success/warning/danger/info-*,
+ * shadow-overlay, ease-standard, duration-state, --kb-*) stay in tokens.css.
+ *
+ * Until this file is active, .kb-* components resolve gray, radius and font
+ * from Tailwind's defaults: do not adopt .kb-* classes in a page before Phase 3.
+ */
+
+@theme {
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+
+  /* 9-step scale (px size / px line-height). Nothing above 30px inside the app. */
+  --text-xs: 0.75rem;          /* 12 / 16  meta, captions — never body text      */
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;         /* 14 / 20  dense UI, table cells                 */
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;           /* 16 / 24  body, form input                      */
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;         /* 18 / 28  lead paragraph                        */
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;          /* 20 / 28  section heading                       */
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;          /* 24 / 32  page heading                          */
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;        /* 30 / 36  dashboard greeting, marketing h2      */
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;         /* 36 / 44  marketing only                        */
+  --text-4xl--line-height: 2.75rem;
+  --text-5xl: 3rem;            /* 48 / 56  marketing only                        */
+  --text-5xl--line-height: 3.5rem;
+  --tracking-tight: -0.01em;   /* use on 24px and above                          */
+
+  /* Fixes the undefined bg-primary-600/700 classes found in the audit */
+  --color-primary-50:  var(--color-brand-50);
+  --color-primary-100: var(--color-brand-100);
+  --color-primary-200: var(--color-brand-200);
+  --color-primary-300: var(--color-brand-300);
+  --color-primary-400: var(--color-brand-400);
+  --color-primary-500: var(--color-brand-500);
+  --color-primary-600: var(--color-brand-600);
+  --color-primary-700: var(--color-brand-700);
+  --color-primary-800: var(--color-brand-800);
+  --color-primary-900: var(--color-brand-900);
+
+  /* ── Neutrals: ramp abu-abu kehijauan-navy, dipetakan ke peran (menimpa gray-*) ── */
+  --color-gray-50:  #f5f8f8;   /* netral muda                                    */
+  --color-gray-100: #eaf0f0;
+  --color-gray-200: #dbe5e4;   /* pembatas dekoratif                             */
+  --color-gray-300: #c3d0d0;   /* garis tepi tombol                              */
+  --color-gray-400: #7b8e92;   /* border input (3,4:1) — BUKAN untuk teks        */
+  --color-gray-500: #566b73;   /* teks tersier (5,6:1 di atas putih)             */
+  --color-gray-600: #3f5260;   /* teks sekunder (8,1:1)                          */
+  --color-gray-700: #2e3f4b;
+  --color-gray-800: #22313f;
+  --color-gray-900: #16293d;   /* teks utama (14,8:1), tinta navy-gelap          */
+
+  /* ── Radius: kontrol 10px, panel 14px, dialog 16px; penuh hanya untuk avatar + pil status ── */
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-md: 10px;    /* kontrol */
+  --radius-lg: 14px;    /* panel   */
+  --radius-xl: 16px;    /* dialog, drawer; juga utilitas rounded-xl di halaman lama */
+  --radius-2xl: 16px;
+  --radius-3xl: 16px;
+
+  /* ── Remap palet Tailwind: halaman lama yang masih memakai blue/indigo/purple ikut berubah
+     tanpa menyentuh HTML. blue/indigo -> teal (500 dan 600 -> teal utama), purple/violet -> navy.
+     green/yellow/amber/red dibiarkan (semantik). ── */
+  --color-blue-50:  var(--color-brand-50);   --color-indigo-50:  var(--color-brand-50);
+  --color-blue-100: var(--color-brand-100);  --color-indigo-100: var(--color-brand-100);
+  --color-blue-200: var(--color-brand-200);  --color-indigo-200: var(--color-brand-200);
+  --color-blue-300: var(--color-brand-300);  --color-indigo-300: var(--color-brand-300);
+  --color-blue-400: var(--color-brand-400);  --color-indigo-400: var(--color-brand-400);
+  --color-blue-500: var(--color-brand-600);  --color-indigo-500: var(--color-brand-600);
+  --color-blue-600: var(--color-brand-600);  --color-indigo-600: var(--color-brand-600);
+  --color-blue-700: var(--color-brand-700);  --color-indigo-700: var(--color-brand-700);
+  --color-blue-800: var(--color-brand-800);  --color-indigo-800: var(--color-brand-800);
+  --color-blue-900: var(--color-brand-900);  --color-indigo-900: var(--color-brand-900);
+  --color-blue-950: var(--color-brand-900);  --color-indigo-950: var(--color-brand-900);
+
+  --color-purple-50:  var(--color-navy-50);   --color-violet-50:  var(--color-navy-50);
+  --color-purple-100: var(--color-navy-100);  --color-violet-100: var(--color-navy-100);
+  --color-purple-200: var(--color-navy-200);  --color-violet-200: var(--color-navy-200);
+  --color-purple-300: var(--color-navy-300);  --color-violet-300: var(--color-navy-300);
+  --color-purple-400: var(--color-navy-400);  --color-violet-400: var(--color-navy-400);
+  --color-purple-500: var(--color-navy-500);  --color-violet-500: var(--color-navy-500);
+  --color-purple-600: var(--color-navy-600);  --color-violet-600: var(--color-navy-600);
+  --color-purple-700: var(--color-navy-700);  --color-violet-700: var(--color-navy-700);
+  --color-purple-800: var(--color-navy-800);  --color-violet-800: var(--color-navy-800);
+  --color-purple-900: var(--color-navy-900);  --color-violet-900: var(--color-navy-900);
+  --color-purple-950: var(--color-navy-900);  --color-violet-950: var(--color-navy-900);
+}
+
+/* ── Base (moved from components.css) ─────────────────────────────── */
+@layer base {
+  html { font-family: var(--font-sans); -webkit-text-size-adjust: 100%; accent-color: var(--kb-brand); }
+  ::selection { background: var(--color-brand-100); color: var(--color-gray-900); }
+  body { color: var(--kb-text-primary); background: var(--kb-surface-page); font-size: 1rem; line-height: 1.5rem; }
+  /* Not :where() — Tailwind preflight sets h1–h6 { font-weight: inherit } and would win on specificity. */
+  h1, h2, h3, h4 { font-weight: 700; text-wrap: balance; }
+  h1, h2 { letter-spacing: var(--tracking-tight); }
+  :where(table, .kb-num) { font-variant-numeric: tabular-nums; }
+  :where(p, li, dd, td, dt, label, figcaption) { overflow-wrap: anywhere; } /* 76-char institution names, long emails */
+  :where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid var(--kb-focus);
+    outline-offset: 2px;
+    border-radius: var(--kb-radius-control);
+  }
+}
+
+/* ── Font alias shim (Phase 3, D-20). The site layouts no longer load Google Fonts, but 20
+   un-migrated views still name 'Outfit' (and one 'Inter') in their own inline styles. These two
+   names now resolve to the local Plus Jakarta Sans files instead of falling back to Arial, so the
+   whole app keeps one type system with no extra request. Remove each alias once no view names it.
+   Website fonts only; certificate fonts (GD, public/assets/certificate/fonts) are unaffected. ── */
+@font-face { font-family: "Outfit"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("/assets/fonts/plus-jakarta-sans/PlusJakartaSans-latin-wght.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Outfit"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("/assets/fonts/plus-jakarta-sans/PlusJakartaSans-latin-ext-wght.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("/assets/fonts/plus-jakarta-sans/PlusJakartaSans-latin-wght.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("/assets/fonts/plus-jakarta-sans/PlusJakartaSans-latin-ext-wght.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+/* ── Page support moved from the inline <style> of layouts/app.blade.php (Phase 3).
+   Still used by pages that are not migrated yet; remove with those pages. The old
+   body/heading font rules (Inter, Outfit) and the custom scrollbar were dropped:
+   the type system above replaces them. ── */
+.marketplace-hero-applications h1, .marketplace-hero-applications h2,
+.marketplace-hero-jobs h1, .marketplace-hero-jobs h2 { color: #fff !important; }   /* student/applications, student/jobs */
+.avatar-circle { border-radius: 50%; object-fit: cover; flex-shrink: 0; }          /* student/friends */
+.avatar-xs  { width: 24px;  height: 24px; }
+.avatar-sm  { width: 32px;  height: 32px; }
+.avatar-md  { width: 40px;  height: 40px; }
+.avatar-lg  { width: 56px;  height: 56px; }
+.avatar-xl  { width: 80px;  height: 80px; }
+.avatar-2xl { width: 120px; height: 120px; }
+.text-secondary { color: var(--kb-text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-aos] { opacity: 1 !important; transform: none !important; transition: none !important; } /* until AOS is removed */
+}
+
+/* Halaman lama memakai gray-400 dan yellow-600 sebagai warna TEKS; kontrasnya di bawah 4,5:1.
+   gray-400 dirancang untuk border input saja, jadi sebagai teks dinaikkan ke gray-500 dan warning-700. */
+.text-gray-400 { color: var(--color-gray-500); }
+.text-yellow-600, .text-yellow-500, .text-amber-600 { color: var(--color-warning-700); }

@@ -1,0 +1,22 @@
+/* ════════════════════════════════════════════════════════════════════
+ * Phase 29 paket B (2026-11-01): proyek aktif mahasiswa (detail, laporan kemajuan, laporan akhir).
+ * The pages reuse the phase 19 detail pattern (.kb-inst-detail, .kb-inst-timeline, stage meter) and the
+ * phase 18 sectioned form (.kb-inst-section, .kb-inst-grid-2, .kb-inst-savebar). Only the pieces below are new.
+ * Existing tokens only; no shadow, no gradient.
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ── page header: up to three actions wrap instead of widening the page at 360-390px ── */
+.kb-sp-header .kb-page-header__actions { flex-wrap: wrap; }
+
+/* ── milestone: inline update form under the timeline entry ── */
+.kb-sp-milestone__actions { margin-top: .25rem; }
+.kb-sp-milestone__form { max-width: 32rem; margin-top: .5rem; padding: 1rem; border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); background: var(--kb-surface-raised); }
+.kb-sp-milestone__pct { max-width: 10rem; }
+
+/* ── rail: institution with logo or initials ── */
+.kb-sp-org { display: flex; align-items: flex-start; gap: .75rem; min-width: 0; }
+.kb-sp-org > div { display: grid; gap: .125rem; min-width: 0; }
+.kb-sp-org__name { margin: 0; font-size: .9375rem; line-height: 1.375rem; font-weight: 600; color: var(--kb-text-primary); overflow-wrap: anywhere; }
+
+/* ── final report: notice list ── */
+.kb-sp-list { display: grid; gap: .25rem; margin: 0; padding-left: 1.25rem; list-style: disc; }

@@ -1,0 +1,116 @@
+/*
+ * Kolabora — Phase 16 (2026-11-01): Kora assistant (/student/chatbot, /student/chatbot/{id}) and the
+ * notifications inbox (/notifications, one template for student, institution and company).
+ *
+ * Imported by app.css after student-repository.css (its own file; existing tokens only). Workbench layer only:
+ * page header, divider-separated lists, bordered panels, no shadow (guardrail 4), no gradient, no photo.
+ * The bell dropdown (.kb-notif, Phase 3) is not styled here.
+ */
+
+/* ════════════════════════ Kora: two columns (history | conversation) ════════════════════════ */
+.kb-chat { padding-bottom: 3rem; }
+.kb-chat__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.kb-chat__layout > * { min-width: 0; }
+@media (min-width: 1024px) {
+  .kb-chat__layout { grid-template-columns: 18rem minmax(0, 1fr); gap: 2rem; }
+}
+
+/* ── History (left) ── */
+.kb-chat__history-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+.kb-chat__history-head h2 { margin: 0; font-size: 1rem; line-height: 1.5rem; }
+.kb-chat__history-toggle .kb-icon { transition: transform var(--duration-state) var(--ease-standard); }
+.kb-chat__history-toggle[aria-expanded="true"] .kb-icon { transform: rotate(180deg); }
+.kb-chat__history-body[data-collapsed] { display: none; }
+@media (min-width: 1024px) {
+  .kb-chat__history-toggle { display: none; }
+  .kb-chat__history-body[data-collapsed] { display: block; }
+}
+.kb-chat__conversations { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--kb-border-default); }
+.kb-chat__conversations > li { border-bottom: 1px solid var(--kb-border-default); }
+.kb-chat__conversation { display: grid; gap: .125rem; padding: .75rem; color: inherit; text-decoration: none; transition: background-color var(--duration-state) var(--ease-standard); }
+.kb-chat__conversation:hover { background: var(--kb-surface-sunken); }
+.kb-chat__conversation[aria-current="page"] { background: var(--kb-brand-tint); }
+.kb-chat__conversation-title { font: 600 .875rem/1.25rem var(--font-sans); color: var(--kb-text-primary); overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.kb-chat__conversation-meta { font-size: .75rem; line-height: 1rem; color: var(--kb-text-secondary); font-variant-numeric: tabular-nums; }
+.kb-chat__history-pages { margin-top: .75rem; }
+.kb-chat__history-pages .kb-pagination__list .kb-pagination__page { display: none; }
+.kb-chat__history-empty { margin: 0; padding: .75rem 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); border-top: 1px solid var(--kb-border-default); }
+
+/* ── Conversation pane (right): bordered panel, no shadow ── */
+.kb-chat__pane { display: flex; flex-direction: column; border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); background: var(--kb-surface-raised); }
+.kb-chat__pane-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: .75rem 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--kb-border-default); }
+.kb-chat__pane-title { min-width: 0; flex: 1 1 16rem; }
+.kb-chat__pane-title h2 { margin: 0; font-size: 1.125rem; line-height: 1.75rem; overflow-wrap: break-word; }
+.kb-chat__pane-title p { margin: .125rem 0 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-chat__pane-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+.kb-chat__thread { display: flex; flex-direction: column; gap: 1rem; padding: 1.25rem; overflow-y: auto; height: clamp(18rem, calc(100dvh - 24rem), 40rem); background: var(--kb-surface-sunken); }
+.kb-chat__thread:focus-visible { outline: 2px solid var(--kb-focus); outline-offset: -2px; }
+.kb-chat__thread-empty { margin: auto; max-width: 28rem; text-align: center; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+
+/* pesan: blok bergaris tanpa bayangan; pengguna di kanan (tint merek), Kora di kiri (putih). nama penulis selalu tertulis. */
+.kb-chat__msg { max-width: min(42rem, 88%); padding: .75rem 1rem; border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); background: var(--kb-surface-raised); align-self: flex-start; }
+.kb-chat__msg[data-role="user"] { align-self: flex-end; background: var(--kb-brand); border-color: var(--kb-brand); }
+.kb-chat__msg:not([data-role="user"]) { background: var(--color-brand-50); border-color: var(--color-brand-100); }
+.kb-chat__author { margin: 0 0 .25rem; font: 600 .75rem/1rem var(--font-sans); color: var(--kb-text-secondary); }
+.kb-chat__msg[data-role="user"] :where(.kb-chat__author, .kb-chat__text, .kb-chat__time) { color: #fff; }
+.kb-chat__text { margin: 0; font-size: .875rem; line-height: 1.5rem; color: var(--kb-text-primary); white-space: pre-wrap; overflow-wrap: anywhere; }
+.kb-chat__time { display: block; margin-top: .375rem; font-size: .75rem; line-height: 1rem; color: var(--kb-text-tertiary); font-variant-numeric: tabular-nums; }
+.kb-chat__sources { margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--kb-border-default); }
+.kb-chat__sources > p { margin: 0 0 .375rem; font: 600 .75rem/1rem var(--font-sans); color: var(--kb-text-secondary); }
+.kb-chat__sources ul { display: grid; gap: .25rem; margin: 0; padding: 0; list-style: none; }
+.kb-chat__sources a { display: inline-flex; align-items: flex-start; gap: .375rem; min-height: 1.5rem; font-size: .8125rem; line-height: 1.25rem; color: var(--kb-text-link); overflow-wrap: anywhere; }
+.kb-chat__sources a .kb-icon { margin-top: .125rem; }
+.kb-chat__typing { display: inline-flex; align-items: center; gap: .5rem; margin: 0; align-self: flex-start; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+
+/* ── Composer ── */
+.kb-chat__composer { display: grid; gap: .375rem; padding: 1rem 1.25rem; border-top: 1px solid var(--kb-border-default); }
+.kb-chat__composer-row { display: flex; align-items: flex-end; gap: .75rem; }
+.kb-chat__composer-row .kb-textarea { flex: 1; min-width: 0; min-height: 2.75rem; max-height: 10rem; resize: none; }
+.kb-chat__composer-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; }
+.kb-chat__composer-foot p { margin: 0; font-size: .75rem; line-height: 1rem; color: var(--kb-text-secondary); }
+@media (max-width: 479px) {
+  .kb-chat__composer-row { flex-direction: column; align-items: stretch; }
+  .kb-chat__pane-head, .kb-chat__thread, .kb-chat__composer { padding-inline: 1rem; }
+  .kb-chat__msg { max-width: 94%; }
+}
+
+/* ── Welcome pane (list page, nothing selected) ── */
+.kb-chat__welcome { align-items: flex-start; gap: .75rem; padding: 1.5rem; }
+.kb-chat__welcome-icon { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: var(--kb-radius-control); background: var(--kb-brand-tint); color: var(--kb-brand); }
+.kb-chat__welcome h2 { margin: 0; font-size: 1.125rem; line-height: 1.75rem; }
+.kb-chat__welcome > p { margin: 0; max-width: 60ch; font-size: .875rem; line-height: 1.5rem; color: var(--kb-text-secondary); }
+.kb-chat__examples { width: 100%; max-width: 40rem; }
+.kb-chat__examples h3 { margin: .25rem 0 .5rem; font-size: .875rem; line-height: 1.25rem; }
+.kb-chat__examples ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--kb-border-default); }
+.kb-chat__examples li { padding: .5rem 0; border-bottom: 1px solid var(--kb-border-default); font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-primary); }
+
+/* ════════════════════════ Notifications inbox (all roles) ════════════════════════ */
+.kb-inbox { padding-bottom: 4rem; }
+@media (max-width: 639px) { .kb-inbox .kb-page-header__actions { flex-wrap: wrap; } }
+.kb-inbox__count { margin: 1.25rem 0 .5rem; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-inbox__count p { margin: 0; }
+.kb-inbox__count b { font-weight: 600; color: var(--kb-text-primary); font-variant-numeric: tabular-nums; }
+
+.kb-inbox__group { margin-top: 1.5rem; }
+.kb-inbox__day { margin: 0 0 .5rem; font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--kb-text-secondary); }
+.kb-inbox__list > li.kb-inbox__item { padding: 0; }
+.kb-inbox__row { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem .75rem; }
+.kb-inbox__item[data-unread] .kb-inbox__row { background: var(--kb-brand-tint); }
+.kb-inbox__icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--kb-radius-control); background: var(--color-gray-100); color: var(--color-gray-700); }
+.kb-inbox__item[data-unread] .kb-inbox__icon { background: var(--kb-surface-raised); color: var(--kb-brand); }
+.kb-inbox__main { flex: 1; min-width: 0; }
+.kb-inbox__title { margin: 0; font: 500 .9375rem/1.375rem var(--font-sans); color: var(--kb-text-primary); overflow-wrap: break-word; }
+.kb-inbox__item[data-unread] .kb-inbox__title { font-weight: 600; }
+.kb-inbox__msg { margin: .125rem 0 0; max-width: 68ch; font-size: .875rem; line-height: 1.375rem; color: var(--kb-text-secondary); overflow-wrap: break-word; }
+.kb-inbox__meta { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .375rem; margin: .375rem 0 0; font-size: .75rem; line-height: 1rem; color: var(--kb-text-secondary); }
+.kb-inbox__unread { display: inline-flex; align-items: center; gap: .375rem; font-weight: 600; color: var(--color-brand-700); }
+.kb-inbox__dot { width: .5rem; height: .5rem; border-radius: 999px; background: var(--kb-accent); }
+.kb-inbox__actions { display: flex; flex: none; align-items: center; gap: .5rem; }
+.kb-inbox__actions form { display: contents; }
+@media (max-width: 639px) {
+  .kb-inbox__row { flex-wrap: wrap; }
+  .kb-inbox__main { flex-basis: calc(100% - 3rem); }
+  .kb-inbox__actions { width: 100%; justify-content: flex-end; }
+}
+.kb-inbox__pages { margin-top: 1.5rem; }

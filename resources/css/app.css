@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+/* kolabora design system. phase 2 menambahkan font, token dan komponen; phase 3 mengaktifkan legacy-overrides.css bersama shell baru (D-29). */
+@import './kolabora/fonts.css';
+@import './kolabora/tokens.css';
+@import './kolabora/components.css';
+@import './kolabora/hero.css'; /* beranda: pembuka video (AD-11) */
+@import './kolabora/public-pages.css'; /* phase 5: tentang kami, kontak, profil publik instansi */
+@import './kolabora/auth.css'; /* phase 6: masuk, registrasi, lupa/reset password */
+@import './kolabora/student-dashboard.css'; /* phase 7: dashboard mahasiswa */
+@import './kolabora/student-browse.css'; /* phase 8: telusuri masalah */
+@import './kolabora/student-brief.css'; /* phase 9: detail masalah (brief) */
+@import './kolabora/student-repository.css'; /* phase 14: repositori pengetahuan */
+@import './kolabora/assistant-inbox.css'; /* phase 16: Kora dan kotak masuk notifikasi */
+@import './kolabora/institution.css'; /* phase 17: ruang kerja instansi (dashboard) */
+@import './kolabora/company.css'; /* phase 21: ruang kerja perusahaan (dashboard) */
+@import './kolabora/errors.css'; /* phase 26: halaman galat 403/404/419/500/503 */
+@import './kolabora/student-project.css'; /* phase 29 paket B: proyek aktif mahasiswa */
+@import './kolabora/legacy-overrides.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* phase 3: blok @theme 'Instrument Sans' (font yang tidak pernah dimuat) dihapus; --font-sans kini dari legacy-overrides.css */

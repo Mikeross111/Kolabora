@@ -1,0 +1,142 @@
+/*
+ * Kolabora — design tokens (Tailwind CSS v4 @theme + semantic CSS variables)
+ *
+ * Bahasa visual: bulat, hangat, terang. Teal dominan (brand), oranye sebagai aksen,
+ * navy hanya untuk teks dan garis kecil. Warna diturunkan dari logo Kolabora.
+ *
+ * Token ber-namespace Kolabora (brand-*, earth-*, navy-*, success/warning/danger/info-*,
+ * shadow-*, --kb-*) ada di sini. Token yang menimpa nama bawaan Tailwind (gray-*, radius-*,
+ * font-*, blue/indigo/purple-*) ada di legacy-overrides.css.
+ *
+ * Kontras (WCAG 2.x, dihitung):
+ *   putih di atas brand-600 5,0:1 · putih di atas brand-700 7,5:1 · putih di atas brand-900 12,4:1
+ *   gray-900 di atas putih 14,8:1 · gray-600 8,1:1 · gray-500 5,6:1 · gray-400 (border input) 3,4:1
+ *   navy-ink di atas oranye-500 5,5:1 · oranye-600 di atas putih 5,1:1
+ * Teal logo (brand-500) hanya untuk dekorasi besar: 3,2:1 dengan putih.
+ */
+
+@theme {
+  /* ── Brand: teal (utama: tombol, link, fokus, menu aktif = 600) ── */
+  --color-brand-50:  #f1f8f7;
+  --color-brand-100: #d6eeeb;
+  --color-brand-200: #aadcd6;
+  --color-brand-300: #78c5bd;
+  --color-brand-400: #43ada3;
+  --color-brand-500: #28a098;  /* teal logo: dekorasi saja */
+  --color-brand-600: #0f7d73;  /* utama */
+  --color-brand-700: #0b5f58;  /* hover */
+  --color-brand-800: #084a45;  /* aktif / header tabel */
+  --color-brand-900: #0b3b3a;  /* footer, hero */
+
+  /* ── Earth: aksen oranye dari logo (500 = #f08028; 600 untuk teks di atas putih) ── */
+  --color-earth-50:  #fef1e7;
+  --color-earth-100: #fcdfc2;
+  --color-earth-300: #f6ad6e;
+  --color-earth-500: #f08028;
+  --color-earth-600: #b2530a;  /* 5,1:1 di atas putih */
+  --color-earth-700: #8f4208;
+
+  /* ── Navy: warna logo "KOLA"; hanya teks, garis aksen, lencana perusahaan ── */
+  --color-navy-50:  #eef3f8;
+  --color-navy-100: #d9e4ee;
+  --color-navy-200: #b3c9dd;
+  --color-navy-300: #82a5c4;
+  --color-navy-400: #4f7ba3;
+  --color-navy-500: #28577f;
+  --color-navy-600: #103050;
+  --color-navy-700: #0c2742;
+  --color-navy-800: #091f35;
+  --color-navy-900: #061527;
+
+  /* ── Semantic: each text color pairs with its tint at >= 4.5:1 (tidak diubah) ── */
+  --color-success-50: #e9f6ef;  --color-success-600: #1b7a4b;  --color-success-700: #14633d;
+  --color-warning-50: #fff4dc;  --color-warning-600: #9a5f00;  --color-warning-700: #7a4a00;
+  --color-danger-50:  #fdecea;  --color-danger-600:  #b42318;  --color-danger-700:  #a3201a;
+  --color-info-50:    #e8f1fb;  --color-info-600:    #1d5fa8;  --color-info-700:    #1a528f;
+
+  /* ── Elevation: kartu yang bisa diklik (hover) dan overlay (menu, dialog, toast, bilah lekat) ── */
+  --shadow-card: 0 1px 2px rgb(16 48 80 / 0.06), 0 6px 16px -6px rgb(16 48 80 / 0.14);
+  --shadow-overlay: 0 12px 32px -8px rgb(16 48 80 / 0.22), 0 2px 8px -2px rgb(16 48 80 / 0.12);
+
+  /* ── Motion ── */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-state: 150ms;      /* state changes only: max 150–200ms */
+}
+
+/* ── Semantic variables (what components consume) ───────────────────── */
+:root {
+  color-scheme: light;
+
+  --kb-surface-page: #ffffff;
+  --kb-surface-raised: #ffffff;
+  --kb-surface-sunken: var(--color-brand-50);
+
+  --kb-text-primary: var(--color-gray-900);
+  --kb-text-secondary: var(--color-gray-600);  /* >= 7:1  */
+  --kb-text-tertiary: var(--color-gray-500);   /* >= 4.5:1 */
+  --kb-text-on-brand: #ffffff;
+  --kb-text-link: var(--color-brand-700);
+
+  --kb-border-default: var(--color-gray-200);  /* pembatas, panel             */
+  --kb-border-strong: var(--color-gray-300);   /* garis tepi tombol           */
+  --kb-border-control: var(--color-gray-400);  /* input: WCAG 1.4.11 >= 3:1   */
+
+  --kb-brand: var(--color-brand-600);
+  --kb-brand-hover: var(--color-brand-700);
+  --kb-brand-active: var(--color-brand-800);
+  --kb-brand-tint: var(--color-brand-50);
+  --kb-focus: var(--color-brand-600);
+
+  --kb-earth: var(--color-earth-600);
+  --kb-earth-tint: var(--color-earth-50);
+
+  /* Aksen oranye: CTA hero, lencana, penanda. Teks di atasnya memakai tinta gelap (5,5:1). */
+  --kb-accent: var(--color-earth-500);
+  --kb-accent-ink: var(--color-gray-900);
+
+  /* Kode peran: mahasiswa teal · instansi oranye · perusahaan navy */
+  --kb-role-student: var(--color-brand-600);
+  --kb-role-institution: var(--color-earth-500);
+  --kb-role-company: var(--color-navy-600);
+
+  /* One status vocabulary: Menunggu · Ditinjau · Diterima · Ditolak · Dibatalkan */
+  --kb-status-menunggu-bg: var(--color-gray-100);    --kb-status-menunggu-fg: var(--color-gray-700);
+  --kb-status-ditinjau-bg: var(--color-info-50);     --kb-status-ditinjau-fg: var(--color-info-700);
+  --kb-status-diterima-bg: var(--color-success-50);  --kb-status-diterima-fg: var(--color-success-700);
+  --kb-status-ditolak-bg: var(--color-danger-50);    --kb-status-ditolak-fg: var(--color-danger-700);
+  --kb-status-dibatalkan-bg: var(--color-gray-100);  --kb-status-dibatalkan-fg: var(--color-gray-600);
+
+  --kb-radius-control: var(--radius-md);
+  --kb-radius-panel: var(--radius-lg);
+
+  /* Layout widths: workspace 1200, reading column 720, forms 640–720 */
+  --kb-w-workspace: 75rem;
+  --kb-w-reading: 45rem;
+  --kb-w-form: 42rem;
+  --kb-gutter: 1rem;           /* mobile; 1.5rem tablet; 2rem desktop (see components.css) */
+
+  /* Garis aksen 3 warna (meniru logo): tepi atas header dan footer */
+  --kb-brand-stripe: linear-gradient(90deg, #103050 0 33.34%, #28a098 33.34% 66.67%, #f08028 66.67% 100%);
+
+  /* Hero beranda: teks putih di atas latar bergerak, satu scrim untuk keterbacaan */
+  --kb-on-media: #ffffff;
+  --kb-on-media-muted: rgb(255 255 255 / 0.88);
+  --kb-on-media-line: rgb(255 255 255 / 0.6);
+  --kb-on-media-hover: rgb(255 255 255 / 0.12);
+  --kb-hero-ink: #16293d;      /* teks tinta pada aksi putih di hero */
+  --kb-hero-ground: #0b3b3a;   /* di belakang poster sampai selesai dimuat */
+  --kb-hero-scrim: rgb(8 40 40 / 0.35);
+  --kb-hero-scrim-deep: rgb(8 40 40 / 0.70);
+  --kb-hero-scrim-tint: rgb(15 125 115 / 0.25);
+}
+
+/* Permukaan gelap (panel samping auth, footer) */
+.kb-on-dark {
+  --kb-surface-page: #0b3b3a;
+  --kb-text-primary: #f1f8f7;
+  --kb-text-secondary: #cfe6e3;
+  --kb-text-link: #aadcd6;
+  --kb-border-default: #1c5753;
+  color: var(--kb-text-primary);
+  background: var(--kb-surface-page);
+}
