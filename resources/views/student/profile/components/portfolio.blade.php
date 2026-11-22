@@ -44,9 +44,23 @@
             <div class="flex flex-wrap gap-2 sm:flex-none sm:justify-end">
                 <x-ui.button :href="route('student.profile.edit')" icon="pencil">Edit profil</x-ui.button>
                 <x-ui.button variant="secondary" icon="copy" data-kb-copy="{{ $shareUrl }}">Salin tautan portofolio</x-ui.button>
+                @isset($qrSvg)
+                    <x-ui.button variant="secondary" icon="link" type="button" data-kb-open="kb-qr">Kode QR</x-ui.button>
+                @endisset
+                <x-ui.button variant="secondary" icon="download" :href="route('student.profile.export-pdf')">Unduh PDF</x-ui.button>
             </div>
         @endif
     </header>
+
+    @if ($owner && isset($qrSvg))
+        <x-ui.modal id="kb-qr" title="Kode QR portofolio">
+            <div class="grid justify-items-center gap-3 text-center">
+                <img src="{{ $qrSvg }}" alt="Kode QR menuju portofolio {{ $student->first_name }} {{ $student->last_name }}" width="240" height="240" class="size-60">
+                <p class="m-0 max-w-prose text-sm text-gray-700 wrap-break-word">Pindai untuk membuka portofolio publik Anda.<br><span class="text-gray-600">{{ $shareUrl }}</span></p>
+                <a href="{{ $qrSvg }}" download="qr-portofolio-{{ $student->user->username }}.svg" class="kb-btn kb-btn--secondary"><x-icon name="download" size="sm" />Unduh kode QR</a>
+            </div>
+        </x-ui.modal>
+    @endif
 
     <x-ui.summary label="Ringkasan portofolio" class="mt-4" :items="$summary" />
 

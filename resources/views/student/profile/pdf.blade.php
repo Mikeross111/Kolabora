@@ -1,183 +1,101 @@
-{{-- resources/views/student/profile/pdf.blade.php --}}
+{{-- templat PDF portofolio: dirender dompdf (tanpa flexbox/grid, tanpa sumber daya jarak jauh). QR dikirim sebagai data URI PNG. --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $student->first_name }} {{ $student->last_name }} - Resume</title>
+    <title>{{ $student->first_name }} {{ $student->last_name }} - Portofolio Kolabora</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            line-height: 1.6;
-            color: #16293d;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            background: #fff;
-        }
-        .header {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 2px solid #dbe5e4;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #0f7d73, #28a098);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-        .header-info h1 { font-size: 28px; color: #16293d; margin-bottom: 4px; }
-        .header-info .subtitle { font-size: 16px; color: #566b73; margin-bottom: 8px; }
-        .contact-info { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: #3f5260; }
-        .contact-info span { display: flex; align-items: center; gap: 4px; }
-        .section { margin-bottom: 28px; }
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #16293d;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #dbe5e4;
-        }
-        .bio { color: #3f5260; line-height: 1.7; }
-        .skills-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .skill-tag {
-            padding: 6px 12px;
-            background: #f1f8f7;
-            color: #0f7d73;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .project-item {
-            padding: 16px;
-            background: #f5f8f8;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-        .project-item h4 { font-size: 16px; color: #16293d; margin-bottom: 4px; }
-        .project-item p { font-size: 14px; color: #566b73; }
-        .project-meta { font-size: 12px; color: #7b8e92; margin-top: 8px; }
-        .education-item { margin-bottom: 12px; }
-        .education-item h4 { font-size: 15px; color: #16293d; }
-        .education-item p { font-size: 14px; color: #566b73; }
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #dbe5e4;
-            text-align: center;
-            font-size: 12px;
-            color: #7b8e92;
-        }
-        @media print {
-            body { padding: 20px; }
-            .header { page-break-after: avoid; }
-            .section { page-break-inside: avoid; }
-        }
+        @page { margin: 36px 40px; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; line-height: 1.55; color: #16293d; }
+        h1 { margin: 0 0 2px; font-size: 22px; color: #103050; }
+        h2 { margin: 0 0 6px; font-size: 13px; color: #0f7d73; border-bottom: 1px solid #c9d6d3; padding-bottom: 3px; }
+        h3 { margin: 0 0 2px; font-size: 12px; color: #16293d; }
+        p { margin: 0 0 4px; }
+        .muted { color: #566b73; }
+        .small { font-size: 9.5px; color: #7b8e92; }
+        .stripe { height: 5px; background: #0f7d73; margin-bottom: 14px; }
+        table.head { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        td.initials { width: 56px; height: 56px; background: #0f7d73; color: #ffffff; text-align: center; font-size: 20px; font-weight: bold; }
+        td.qr { width: 84px; text-align: right; vertical-align: top; }
+        td.qr img { width: 76px; height: 76px; }
+        .section { margin-bottom: 14px; }
+        .tag { display: inline-block; margin: 0 4px 4px 0; padding: 2px 8px; background: #f1f8f7; color: #0f7d73; border: 1px solid #c9d6d3; font-size: 10px; }
+        .project { margin-bottom: 8px; padding: 7px 9px; background: #f5f8f8; border-left: 3px solid #0f7d73; }
+        .footer { margin-top: 18px; padding-top: 8px; border-top: 1px solid #c9d6d3; text-align: center; }
     </style>
 </head>
 <body>
-    {{-- header --}}
-    <div class="header">
-        <div class="avatar">
-            @if($student->profile_photo_path)
-            <img src="{{ $student->profile_photo_url }}" alt="">
-            @else
-            {{ $student->initials }}
-            @endif
-        </div>
-        <div class="header-info">
-            <h1>{{ $student->first_name }} {{ $student->last_name }}</h1>
-            <div class="subtitle">
-                @if($student->university)
-                {{ $student->major ?? 'Mahasiswa' }} - {{ $student->university->name }}
-                @else
-                Mahasiswa
-                @endif
-            </div>
-            <div class="contact-info">
-                <span>{{ $user->email }}</span>
-                @if($student->phone)
-                <span>{{ $student->phone }}</span>
-                @endif
-            </div>
-        </div>
-    </div>
+    <div class="stripe"></div>
 
-    {{-- bio --}}
-    @if($student->bio)
-    <div class="section">
-        <div class="section-title">Tentang Saya</div>
-        <p class="bio">{{ $student->bio }}</p>
-    </div>
+    <table class="head">
+        <tr>
+            <td class="initials">{{ $student->initials }}</td>
+            <td style="padding-left: 12px; vertical-align: middle;">
+                <h1>{{ $student->first_name }} {{ $student->last_name }}</h1>
+                <p class="muted">
+                    @if ($student->university){{ $student->major ?? 'Mahasiswa' }} &middot; {{ $student->university->name }}@else Mahasiswa @endif
+                    @if ($student->semester) &middot; Semester {{ $student->semester }}@endif
+                </p>
+                <p class="small">{{ $user->email }}@if ($student->phone) &middot; {{ $student->phone }}@endif</p>
+            </td>
+            <td class="qr">
+                <img src="{{ $qrPng }}" alt="Kode QR portofolio">
+                <div class="small">Pindai untuk portofolio</div>
+            </td>
+        </tr>
+    </table>
+
+    @if ($student->bio)
+        <div class="section">
+            <h2>Tentang saya</h2>
+            <p class="muted">{{ $student->bio }}</p>
+        </div>
     @endif
 
-    {{-- skills --}}
-    @if($student->skills && count($student->skills) > 0)
-    <div class="section">
-        <div class="section-title">Keahlian</div>
-        <div class="skills-list">
-            @foreach($student->skills as $skill)
-            <span class="skill-tag">{{ $skill }}</span>
+    @if ($student->skills && count($student->skills) > 0)
+        <div class="section">
+            <h2>Keahlian</h2>
+            @foreach ($student->skills as $skill)<span class="tag">{{ $skill }}</span>@endforeach
+        </div>
+    @endif
+
+    @if ($student->interests && count($student->interests) > 0)
+        <div class="section">
+            <h2>Minat</h2>
+            @foreach ($student->interests as $interest)<span class="tag">{{ $interest }}</span>@endforeach
+        </div>
+    @endif
+
+    @if (isset($projects) && $projects->count() > 0)
+        <div class="section">
+            <h2>Proyek yang diselesaikan</h2>
+            @foreach ($projects->take(8) as $project)
+                <div class="project">
+                    <h3>{{ $project->title }}</h3>
+                    <p class="muted">{{ \Illuminate\Support\Str::limit(strip_tags((string) $project->description), 170) }}</p>
+                    <p class="small">
+                        @if ($project->institution){{ $project->institution->name }} &middot; @endif
+                        @if ($project->start_date){{ $project->start_date->locale('id')->translatedFormat('M Y') }}@endif
+                        @if ($project->end_date) &ndash; {{ $project->end_date->locale('id')->translatedFormat('M Y') }}@endif
+                        @if ($project->rating) &middot; Penilaian instansi: {{ (int) $project->rating }}/5 @endif
+                    </p>
+                </div>
             @endforeach
         </div>
-    </div>
     @endif
 
-    {{-- education --}}
-    @if($student->university)
-    <div class="section">
-        <div class="section-title">Pendidikan</div>
-        <div class="education-item">
-            <h4>{{ $student->university->name }}</h4>
-            <p>{{ $student->major ?? 'Program Studi' }} @if($student->semester)&bull; Semester {{ $student->semester }}@endif</p>
-        </div>
-    </div>
-    @endif
-
-    {{-- projects/portfolio --}}
-    @if(isset($projects) && $projects->count() > 0)
-    <div class="section">
-        <div class="section-title">Pengalaman Proyek</div>
-        @foreach($projects->take(5) as $project)
-        <div class="project-item">
-            <h4>{{ $project->title }}</h4>
-            <p>{{ Str::limit($project->description, 150) }}</p>
-            <div class="project-meta">
-                @if($project->institution){{ $project->institution->name }} &bull; @endif
-                {{ $project->status ?? 'Selesai' }}
-            </div>
-        </div>
-        @endforeach
-    </div>
-    @endif
-
-    {{-- interests --}}
-    @if($student->interests && count($student->interests) > 0)
-    <div class="section">
-        <div class="section-title">Minat</div>
-        <div class="skills-list">
-            @foreach($student->interests as $interest)
-            <span class="skill-tag" style="background: #fef3c7; color: #92400e;">{{ $interest }}</span>
+    @if ($student->stories && count($student->stories) > 0)
+        <div class="section">
+            <h2>Cerita pengalaman</h2>
+            @foreach (array_slice((array) $student->stories, 0, 3) as $story)
+                <p class="muted">{{ \Illuminate\Support\Str::limit(trim((string) $story), 500) }}</p>
             @endforeach
         </div>
-    </div>
     @endif
 
-    {{-- footer --}}
-    <div class="footer">
-        Dibuat dengan Kolabora &bull; {{ now()->format('d F Y') }}
+    <div class="footer small">
+        Portofolio publik: {{ $profileUrl }}<br>
+        Dibuat dengan Kolabora &middot; {{ now()->locale('id')->translatedFormat('j F Y') }}
     </div>
 </body>
 </html>

@@ -59,7 +59,7 @@ class ProfileController extends Controller
         $completeness = $this->getCompleteness()->getData(true);
 
         return view('student.profile.index', array_merge(
-            compact('user', 'student', 'stats', 'completeness'),
+            compact('user', 'student', 'stats', 'completeness') + ['qrSvg' => $this->qrDataUri(route('profile.public', $student->user->username))],
             $portfolioData
         ));
     }
@@ -338,6 +338,21 @@ class ProfileController extends Controller
     // ========================================================================
 
     /**
+     * kode QR portofolio dibuat di server (tanpa layanan pihak ketiga); mengembalikan data URI gambar
+     */
+    private function qrDataUri(string $url, bool $png = false): string
+    {
+        $options = new \chillerlan\QRCode\QROptions([
+            'outputType' => $png ? \chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG : \chillerlan\QRCode\QRCode::OUTPUT_MARKUP_SVG,
+            'outputBase64' => true,
+            'addQuietzone' => true,
+            'scale' => 6,
+        ]);
+
+        return (new \chillerlan\QRCode\QRCode($options))->render($url);
+    }
+
+    /**
      * generate QR code untuk profile
      */
     public function generateQR()
@@ -347,13 +362,10 @@ class ProfileController extends Controller
         $username = $this->portfolioService->generatePortfolioSlug($student);
         $profileUrl = route('profile.public', $username);
 
-        // generate QR code sebagai data URL (menggunakan library sederhana atau API)
-        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($profileUrl);
-
         return response()->json([
             'success' => true,
             'profile_url' => $profileUrl,
-            'qr_url' => $qrApiUrl,
+            'qr_url' => $this->qrDataUri($profileUrl),
             'username' => $username,
         ]);
     }
@@ -363,25 +375,34 @@ class ProfileController extends Controller
     // ========================================================================
 
     /**
-     * export profile ke PDF
+     * export profil dan portofolio ke berkas PDF
      */
     public function exportPDF()
     {
         $user = Auth::user();
         $student = $user->student;
 
-        // ambil data portfolio
         $portfolioData = $this->portfolioService->getPortfolioData($student->id);
+        $profileUrl = route('profile.public', $user->username);
 
-        // render view ke HTML
-        $html = view('student.profile.pdf', array_merge(
-            compact('user', 'student'),
-            $portfolioData
-        ))->render();
+        $html = view('student.profile.pdf', [
+            'user' => $user,
+            'student' => $student,
+            'projects' => $portfolioData['completedProjects'],
+            'profileUrl' => $profileUrl,
+            'qrPng' => $this->qrDataUri($profileUrl, true),
+        ])->render();
 
-        // untuk saat ini return HTML, nanti bisa integrasikan dengan dompdf atau snappy
-        return response($html)
-            ->header('Content-Type', 'text/html')
-            ->header('Content-Disposition', 'inline; filename="profile-' . $student->first_name . '.html"');
+        $dompdf = new \Dompdf\Dompdf(['isRemoteEnabled' => false, 'defaultFont' => 'DejaVu Sans']);
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = 'portofolio-' . \Illuminate\Support\Str::slug($student->first_name . ' ' . $student->last_name) . '.pdf';
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }
