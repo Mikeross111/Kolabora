@@ -92,4 +92,36 @@ class CompanyAccessExportContactTest extends TestCase
         $this->actingAs($user)->postJson('/company/talents/999/contact', ['message' => '', 'type' => 'message'])->assertUnprocessable();
         $this->assertSame(0, Notification::count());
     }
+
+    public function test_settings_page_saves_notification_choices(): void
+    {
+        $this->seedRegion();
+        $co = $this->makeCompany(['name' => 'PT Atur']);
+        $user = User::find($co->user_id);
+
+        $page = $this->actingAs($user)->get('/company/settings')->assertOk()->getContent();
+        $this->assertStringContainsString('Pengaturan akun', $page);
+
+        $this->actingAs($user)->put(route('company.profile.update-settings'), ['email_notifications' => '1', 'marketing_emails' => '1'])
+            ->assertRedirect(route('company.settings'));
+
+        $saved = json_decode((string) DB::table('companies')->where('id', $co->id)->value('settings'), true);
+        $this->assertSame(['email_notifications' => true, 'application_notifications' => false, 'marketing_emails' => true], $saved);
+    }
+
+    public function test_verification_request_keeps_verified_status_and_queues_unverified_companies(): void
+    {
+        $this->seedRegion();
+        $verified = $this->makeCompany(['name' => 'PT Sah', 'verification_status' => 'verified', 'verified_at' => now()]);
+        $plain = $this->makeCompany(['name' => 'PT Baru']);
+
+        $this->actingAs(User::find($verified->user_id))->get(route('company.profile.index'))->assertOk()->assertSee('Ajukan pembaruan verifikasi');
+        $this->actingAs(User::find($verified->user_id))->post(route('company.profile.request-verification'))->assertRedirect(route('company.profile.index'));
+        $this->assertSame('verified', DB::table('companies')->where('id', $verified->id)->value('verification_status'));
+        $this->assertNotNull(DB::table('companies')->where('id', $verified->id)->value('verification_requested_at'));
+
+        $this->actingAs(User::find($plain->user_id))->get(route('company.profile.index'))->assertOk()->assertSee('Ajukan verifikasi');
+        $this->actingAs(User::find($plain->user_id))->post(route('company.profile.request-verification'))->assertRedirect(route('company.profile.index'));
+        $this->assertSame('pending_verification', DB::table('companies')->where('id', $plain->id)->value('verification_status'));
+    }
 }

@@ -357,6 +357,7 @@ Route::middleware(['auth', 'check.user.type:company'])->prefix('company')->name(
 
     // dashboard
     Route::get('/dashboard', [CompanyDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings', [\App\Http\Controllers\Company\ProfileController::class, 'settings'])->name('settings');
 
     // job postings management
     Route::prefix('jobs')->name('jobs.')->group(function () {

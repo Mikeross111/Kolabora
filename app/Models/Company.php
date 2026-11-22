@@ -37,10 +37,16 @@ class Company extends Model
         'instagram',
         'verification_status',
         'verified_at',
+        'settings',
+        'verification_documents',
+        'verification_requested_at',
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'settings' => 'array',
+        'verification_documents' => 'array',
+        'verification_requested_at' => 'datetime',
     ];
 
     // relasi ke user

@@ -139,6 +139,13 @@
         <aside class="kb-org__aside" aria-labelledby="profil-akun">
             <h2 id="profil-akun" class="kb-org__h2">Info akun</h2>
             <x-ui.status domain="verification" :value="$verification" />
+            <form method="POST" action="{{ route('company.profile.request-verification') }}" enctype="multipart/form-data" class="mt-3 grid gap-2">
+                @csrf
+                <label class="kb-label" for="dokumen-verifikasi">Dokumen verifikasi (PDF/JPG/PNG, maks. 10 MB, opsional)</label>
+                <input type="file" id="dokumen-verifikasi" name="verification_documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="kb-input">
+                <x-ui.button type="submit" variant="secondary">{{ $company->is_verified ? 'Ajukan pembaruan verifikasi' : 'Ajukan verifikasi' }}</x-ui.button>
+            </form>
+            <p class="mt-3 mb-0"><a href="{{ route('company.settings') }}" class="text-brand-700 underline">Pengaturan akun</a></p>
             <dl class="kb-co-facts kb-co-facts--single">
                 <div><dt>Email masuk</dt><dd>{{ $company->user?->email ?? '—' }}</dd></div>
                 <div><dt>Bergabung sejak</dt><dd>{{ $company->created_at?->locale('id')->translatedFormat('F Y') ?? '—' }}</dd></div>

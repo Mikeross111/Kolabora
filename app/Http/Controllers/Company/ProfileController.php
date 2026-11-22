@@ -267,57 +267,75 @@ class ProfileController extends Controller
      */
     public function requestVerification(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'verification_documents' => 'nullable|array',
             'verification_documents.*' => 'file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max per file
+        ], [
+            'verification_documents.*.mimes' => 'Dokumen harus berformat PDF, JPG, atau PNG.',
+            'verification_documents.*.max' => 'Ukuran tiap dokumen maksimal 10 MB.',
         ]);
 
-        $user = Auth::user();
-        $company = $user->company;
+        $company = Auth::user()->company;
 
-        // IMPLEMENTED: Upload verification documents to Supabase Storage
         $documentUrls = [];
         if ($request->hasFile('verification_documents')) {
             foreach ($request->file('verification_documents') as $index => $file) {
                 $fileName = 'verification_' . $company->id . '_' . time() . '_' . $index . '.' . $file->getClientOriginalExtension();
-                $documentUrl = $this->supabase->uploadFile('company_documents', $fileName, $file);
-                $documentUrls[] = $documentUrl;
+                $stored = $this->supabase->uploadFile('company_documents', $fileName, $file);
+                if ($stored) {
+                    $documentUrls[] = $stored;
+                }
             }
         }
 
-        // IMPLEMENTED: Update verification status di Supabase PostgreSQL
-        $company->update([
-            'verification_status' => 'pending_verification',
-            'verification_documents' => json_encode($documentUrls),
-        ]);
+        $attributes = [
+            'verification_documents' => array_merge($company->verification_documents ?? [], $documentUrls),
+            'verification_requested_at' => now(),
+        ];
+        // perusahaan yang sudah terverifikasi tetap terverifikasi; yang belum, masuk antrean tinjauan
+        if (! $company->is_verified) {
+            $attributes['verification_status'] = 'pending_verification';
+        }
+        $company->update($attributes);
 
-        return redirect()->route('company.profile.index')
-            ->with('success', 'Verification request submitted successfully! We will review it soon.');
+        return redirect()->route('company.profile.index')->with('success', $company->is_verified
+            ? 'Permintaan pembaruan verifikasi tercatat. Status Terverifikasi Anda tetap berlaku.'
+            : 'Permintaan verifikasi terkirim. Tim Kolabora akan meninjau dokumen Anda.');
     }
 
     /**
-     * Update company settings
-     * IMPLEMENTED: Update langsung ke Supabase PostgreSQL
+     * halaman pengaturan akun perusahaan
+     */
+    public function settings()
+    {
+        $company = Auth::user()->company;
+        $settings = array_merge([
+            'email_notifications' => true,
+            'application_notifications' => true,
+            'marketing_emails' => false,
+        ], (array) $company->settings);
+
+        return view('company.settings', compact('company', 'settings'));
+    }
+
+    /**
+     * simpan pengaturan akun (form biasa atau JSON)
      */
     public function updateSettings(Request $request)
     {
-        $validated = $request->validate([
-            'email_notifications' => 'nullable|boolean',
-            'application_notifications' => 'nullable|boolean',
-            'marketing_emails' => 'nullable|boolean',
-        ]);
+        $company = Auth::user()->company;
 
-        $user = Auth::user();
-        $company = $user->company;
+        $settings = [
+            'email_notifications' => $request->boolean('email_notifications'),
+            'application_notifications' => $request->boolean('application_notifications'),
+            'marketing_emails' => $request->boolean('marketing_emails'),
+        ];
+        $company->update(['settings' => $settings]);
 
-        // IMPLEMENTED: Update settings di Supabase PostgreSQL
-        $company->update([
-            'settings' => json_encode($validated),
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Pengaturan disimpan.', 'settings' => $settings]);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Settings updated successfully',
-        ]);
+        return redirect()->route('company.settings')->with('success', 'Pengaturan disimpan.');
     }
 }
