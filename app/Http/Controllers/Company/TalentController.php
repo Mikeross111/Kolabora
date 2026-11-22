@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\User;
 use App\Models\SavedTalent;
 use App\Models\Province;
@@ -343,21 +344,30 @@ class TalentController extends Controller
         $user = Auth::user();
         $company = $user->company;
 
-        // IMPLEMENTED: Save message to database
-        // This would typically send a notification to the talent
-        DB::connection('pgsql')->table('messages')->insert([
-            'from_user_id' => $user->id,
-            'to_user_id' => $id,
-            'company_id' => $company->id,
+        $talent = User::where('id', $id)->where('user_type', 'student')->first();
+        if (! $talent) {
+            return response()->json(['success' => false, 'message' => 'Talenta tidak ditemukan.'], 404);
+        }
+
+        // pesan sampai ke talenta sebagai notifikasi di akunnya
+        $isInterview = $validated['type'] === 'interview_request';
+        Notification::create([
+            'user_id' => $talent->id,
+            'type' => 'talent_contact',
+            'title' => ($isInterview ? 'Undangan wawancara dari ' : 'Pesan dari ') . $company->name,
             'message' => $validated['message'],
-            'type' => $validated['type'],
-            'created_at' => now(),
-            'updated_at' => now(),
+            'data' => [
+                'company_id' => $company->id,
+                'company_name' => $company->name,
+                'contact_type' => $validated['type'],
+                'from_user_id' => $user->id,
+            ],
+            'is_read' => false,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Message sent successfully'
+            'message' => 'Pesan terkirim ke ' . ($talent->name ?? 'talenta') . '.',
         ]);
     }
 

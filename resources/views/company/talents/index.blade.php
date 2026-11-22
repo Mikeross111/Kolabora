@@ -156,6 +156,9 @@
                                            @change="togglePick({{ $talent['id'] }}, @js($talent['name']))">
                                     <span>Bandingkan<span class="sr-only"> {{ $talent['name'] }}</span></span>
                                 </label>
+                                <button type="button" class="kb-btn kb-btn--secondary" @click="openContact({{ $talent['id'] }}, @js($talent['name']))">
+                                    <x-icon name="mail" size="sm" />Hubungi<span class="sr-only"> {{ $talent['name'] }}</span>
+                                </button>
                                 <button type="button" class="kb-btn kb-btn--secondary kb-co-talents__save"
                                         :aria-pressed="isSaved({{ $talent['id'] }}).toString()"
                                         aria-pressed="{{ in_array($talent['id'], $savedIds, true) ? 'true' : 'false' }}"
@@ -185,6 +188,26 @@
         </section>
     </div>
 
+    <x-ui.modal id="kb-contact" title="Hubungi talenta">
+        <p class="m-0 mb-3 text-sm text-gray-700">Pesan akan dikirim ke <b x-text="contactName"></b> sebagai notifikasi di akun mahasiswa.</p>
+        <div class="kb-field">
+            <label class="kb-label" for="contact-type">Jenis pesan</label>
+            <select id="contact-type" class="kb-select" x-model="contactType">
+                <option value="message">Pesan biasa</option>
+                <option value="interview_request">Undangan wawancara</option>
+            </select>
+        </div>
+        <div class="kb-field mt-3">
+            <label class="kb-label" for="contact-msg">Pesan</label>
+            <textarea id="contact-msg" class="kb-textarea" rows="5" maxlength="1000" x-model="contactMsg" placeholder="Perkenalkan perusahaan dan tujuan Anda menghubungi."></textarea>
+            <p class="kb-help"><span x-text="contactMsg.length"></span>/1000 karakter</p>
+        </div>
+        <x-slot:footer>
+            <button type="button" class="kb-btn kb-btn--tertiary" data-kb-close>Batal</button>
+            <button type="button" class="kb-btn kb-btn--primary" :disabled="sending" @click="sendContact()">Kirim pesan</button>
+        </x-slot:footer>
+    </x-ui.modal>
+
     {{-- bilah banding: hanya muncul bila ada talenta yang dipilih (2-3 untuk dibandingkan) --}}
     <div class="kb-co-talents__compare" x-show="picked.length > 0" x-cloak role="region" aria-label="Perbandingan talenta">
         <p class="kb-co-talents__compare-text" aria-live="polite">
@@ -209,6 +232,11 @@ function talentDirectory(savedIds) {
     return {
         saved: savedIds.map(Number),
         busy: null,
+        contactId: null,
+        contactName: '',
+        contactType: 'message',
+        contactMsg: '',
+        sending: false,
         picked: [],
         savedSearches: [],
         naming: false,
@@ -266,6 +294,40 @@ function talentDirectory(savedIds) {
 
         isSaved(id) {
             return this.saved.includes(id);
+        },
+
+        openContact(id, name) {
+            this.contactId = id;
+            this.contactName = name;
+            this.contactMsg = '';
+            this.contactType = 'message';
+            window.dispatchEvent(new CustomEvent('kb-open-modal', { detail: 'kb-contact' }));
+        },
+
+        async sendContact() {
+            const text = this.contactMsg.trim();
+            if (!text) { window.showNotification('Tulis pesan terlebih dahulu.', 'error'); return; }
+            if (this.sending) return;
+            this.sending = true;
+            try {
+                const response = await fetch(`{{ url('/company/talents') }}/${this.contactId}/contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ message: text, type: this.contactType }),
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error(data.message || 'gagal');
+                window.dispatchEvent(new CustomEvent('kb-close-modal', { detail: 'kb-contact' }));
+                window.showNotification(data.message || 'Pesan terkirim.', 'success');
+            } catch (error) {
+                window.showNotification('Pesan belum terkirim. Coba lagi.', 'error');
+            } finally {
+                this.sending = false;
+            }
         },
 
         async toggleSave(id, name) {

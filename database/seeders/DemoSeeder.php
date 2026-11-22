@@ -36,6 +36,7 @@ class DemoSeeder extends Seeder
             if (DB::table('problems')->count() >= 30) {
                 $this->refreshPhotos();
                 $this->refreshJobText();
+                $this->refreshDemoState();
                 return;
             }
             $this->purge();
@@ -52,6 +53,8 @@ class DemoSeeder extends Seeder
             $this->seedJobs($users);
             $this->seedSocial($users);
         });
+
+        $this->refreshDemoState();
     }
 
     // ───────────────────────── helpers ─────────────────────────
@@ -82,6 +85,46 @@ class DemoSeeder extends Seeder
             'name' => $name, 'email' => $email, 'username' => $username, 'password' => $hash, 'user_type' => $type,
             'is_active' => true, 'email_verified_at' => $at, 'created_at' => $at, 'updated_at' => $at,
         ]);
+    }
+
+    /**
+     * akun demo juri harus selalu punya sesuatu untuk diproses: pelamar yang menunggu (perusahaan),
+     * lamaran dan laporan yang menunggu tinjauan (instansi). hanya memulihkan bila jumlahnya terlalu sedikit,
+     * dan hanya menyentuh data milik akun demo.
+     */
+    private function refreshDemoState(): void
+    {
+        $co = DB::table('companies')->where('email', 'perusahaan@kolabora.test')->value('id');
+        if ($co) {
+            $jobIds = DB::table('job_postings')->where('company_id', $co)->pluck('id');
+            $apps = DB::table('job_applications')->whereIn('job_posting_id', $jobIds)->orderBy('id')->pluck('id');
+            $waiting = DB::table('job_applications')->whereIn('job_posting_id', $jobIds)->whereIn('status', ['pending', 'new'])->count();
+            if ($apps->count() > 0 && $waiting < 4) {
+                $cycle = ['pending', 'pending', 'reviewed', 'shortlisted', 'pending', 'rejected', 'reviewed', 'pending'];
+                foreach ($apps as $i => $id) {
+                    DB::table('job_applications')->where('id', $id)->update(['status' => $cycle[$i % count($cycle)], 'updated_at' => now()]);
+                }
+            }
+        }
+
+        $inst = DB::table('institutions')->where('email', 'instansi@kolabora.test')->value('id');
+        if ($inst) {
+            $problemIds = DB::table('problems')->where('institution_id', $inst)->pluck('id');
+            $pending = DB::table('applications')->whereIn('problem_id', $problemIds)->where('status', 'pending')->count();
+            if ($pending < 4) {
+                $ids = DB::table('applications')->whereIn('problem_id', $problemIds)->whereIn('status', ['reviewed', 'rejected'])
+                    ->orderBy('id')->limit(4 - $pending)->pluck('id');
+                DB::table('applications')->whereIn('id', $ids)->update(['status' => 'pending', 'reviewed_at' => null, 'rejected_at' => null, 'feedback' => null]);
+            }
+
+            $activeIds = DB::table('projects')->where('institution_id', $inst)->where('status', 'active')->pluck('id');
+            $waitingReports = DB::table('project_reports')->whereIn('project_id', $activeIds)->where('status', 'pending')->count();
+            if ($waitingReports < 2) {
+                $ids = DB::table('project_reports')->whereIn('project_id', $activeIds)->where('status', 'approved')
+                    ->orderByDesc('id')->limit(2 - $waitingReports)->pluck('id');
+                DB::table('project_reports')->whereIn('id', $ids)->update(['status' => 'pending', 'institution_feedback' => null, 'reviewed_at' => null]);
+            }
+        }
     }
 
     // ───────────────────────── foto ─────────────────────────
