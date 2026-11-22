@@ -469,6 +469,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard admin
     Route::get('/dashboard', [InstitutionReviewController::class, 'dashboard'])->name('dashboard');
 
+    // Log validasi AI (semua instansi)
+    Route::get('/validation-logs', [InstitutionReviewController::class, 'allValidationLogs'])->name('validation-logs');
+
     // Institution review routes
     Route::prefix('institutions')->name('institutions.')->group(function () {
         // List institutions by status

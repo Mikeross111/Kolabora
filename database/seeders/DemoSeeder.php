@@ -107,6 +107,8 @@ class DemoSeeder extends Seeder
             }
         }
 
+        $this->refreshInstitutionValidation();
+
         $inst = DB::table('institutions')->where('email', 'instansi@kolabora.test')->value('id');
         if ($inst) {
             $problemIds = DB::table('problems')->where('institution_id', $inst)->pluck('id');
@@ -123,6 +125,46 @@ class DemoSeeder extends Seeder
                 $ids = DB::table('project_reports')->whereIn('project_id', $activeIds)->where('status', 'approved')
                     ->orderByDesc('id')->limit(2 - $waitingReports)->pluck('id');
                 DB::table('project_reports')->whereIn('id', $ids)->update(['status' => 'pending', 'institution_feedback' => null, 'reviewed_at' => null]);
+            }
+        }
+    }
+
+    /** instansi demo tervalidasi admin manual, belum pernah lulus validasi AI otomatis; lengkapi skor + log AI-nya */
+    private function refreshInstitutionValidation(): void
+    {
+        $insts = DB::table('institutions')
+            ->where('is_verified', true)
+            ->where('email', 'like', '%kolabora.test')
+            ->where(function ($q) {
+                $q->whereNull('ai_validation_status')->orWhere('ai_validation_status', '!=', 'approved');
+            })
+            ->get();
+
+        foreach ($insts as $i => $inst) {
+            $score = 88 + (($i * 3) % 10);
+            $at = $inst->verified_at ?? $inst->created_at;
+            DB::table('institutions')->where('id', $inst->id)->update([
+                'ai_validation_status' => 'approved',
+                'ai_validation_score' => $score,
+                'ai_validated_at' => $at,
+                'ai_validation_notes' => 'Disetujui otomatis oleh AI: dokumen identitas dan domain instansi terverifikasi.',
+            ]);
+
+            if (DB::table('ai_validation_logs')->where('institution_id', $inst->id)->doesntExist()) {
+                DB::table('ai_validation_logs')->insert([
+                    'institution_id' => $inst->id,
+                    'validation_type' => 'identity_verification',
+                    'is_passed' => true,
+                    'score' => $score,
+                    'confidence' => min(99, $score + 2),
+                    'details' => json_encode(['dokumen' => 'KTP & surat tugas PIC terverifikasi', 'domain_check' => 'sesuai jenis instansi']),
+                    'issues' => json_encode([]),
+                    'recommendation' => 'approve',
+                    'api_used' => 'gemini-2.5-flash',
+                    'processing_time' => 1200 + (($i * 37) % 900),
+                    'created_at' => $at,
+                    'updated_at' => $at,
+                ]);
             }
         }
     }

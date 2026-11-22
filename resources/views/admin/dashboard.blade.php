@@ -6,8 +6,15 @@
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p class="text-gray-600 mt-2">Manage and review institution registrations</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p class="text-gray-600 mt-2">Manage and review institution registrations</p>
+            </div>
+            <a href="{{ route('admin.validation-logs') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium">
+                Log Validasi AI
+            </a>
+        </div>
     </div>
 
     <!-- Stats Cards -->

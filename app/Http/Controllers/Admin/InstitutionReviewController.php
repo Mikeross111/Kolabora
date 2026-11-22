@@ -204,6 +204,24 @@ class InstitutionReviewController extends Controller
     }
 
     /**
+     * Log validasi AI dari semua instansi (riwayat lengkap, terbaru dulu)
+     */
+    public function allValidationLogs(Request $request)
+    {
+        $logs = AIValidationLog::with('institution')
+            ->when($request->filled('validation_type'), fn ($q) => $q->where('validation_type', $request->validation_type))
+            ->when($request->filled('api_used'), fn ($q) => $q->where('api_used', $request->api_used))
+            ->orderBy('created_at', 'desc')
+            ->paginate(25)
+            ->withQueryString();
+
+        $validationTypes = AIValidationLog::select('validation_type')->distinct()->orderBy('validation_type')->pluck('validation_type');
+        $apis = AIValidationLog::select('api_used')->whereNotNull('api_used')->distinct()->orderBy('api_used')->pluck('api_used');
+
+        return view('admin.validation-logs', compact('logs', 'validationTypes', 'apis'));
+    }
+
+    /**
      * Get validation logs for an institution
      */
     public function validationLogs($id)

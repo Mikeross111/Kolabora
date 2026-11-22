@@ -69,13 +69,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <span class="text-lg font-bold text-yellow-600">
+                                <span class="text-lg font-bold text-green-600">
                                     {{ number_format($institution->ai_validation_score, 1) }}
                                 </span>
                                 <span class="text-sm text-gray-500 ml-1">/100</span>
                             </div>
-                            <div class="text-xs text-yellow-600 font-medium mt-1">
-                                ⚠️ Borderline Case
+                            <div class="text-xs text-green-600 font-medium mt-1">
+                                ✅ Terverifikasi
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -83,11 +83,11 @@
                             <div class="text-xs text-gray-400">{{ $institution->created_at->diffForHumans() }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ route('admin.institutions.review', $institution->id) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition inline-flex items-center">
+                            <a href="{{ route('admin.institutions.review', $institution->id) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition inline-flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
-                                Review Documents
+                                Lihat Detail
                             </a>
                         </td>
                     </tr>
@@ -97,8 +97,8 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <p class="mt-4 text-lg font-medium">No institutions require manual review</p>
-                            <p class="mt-2 text-sm">Institutions with AI score 80-84 will appear here</p>
+                            <p class="mt-4 text-lg font-medium">Belum ada instansi yang disetujui</p>
+                            <p class="mt-2 text-sm">Instansi yang lolos validasi AI atau disetujui admin akan muncul di sini</p>
                         </td>
                     </tr>
                     @endforelse
@@ -115,24 +115,20 @@
     </div>
 
     <!-- Info Box -->
-    <div class="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-6">
-        <h3 class="text-purple-900 font-semibold text-lg mb-3">ℹ️ Manual Review Guidelines</h3>
-        <ul class="text-purple-800 space-y-2 text-sm">
+    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-6">
+        <h3 class="text-green-900 font-semibold text-lg mb-3">ℹ️ Tentang instansi yang disetujui</h3>
+        <ul class="text-green-800 space-y-2 text-sm">
             <li class="flex items-start">
-                <span class="text-purple-600 mr-2">•</span>
-                <span><strong>Score 80-84:</strong> Borderline cases that require human judgment</span>
+                <span class="text-green-600 mr-2">•</span>
+                <span><strong>Sudah aktif:</strong> Instansi di daftar ini sudah terverifikasi dan dapat membuka masalah/proyek KKN</span>
             </li>
             <li class="flex items-start">
-                <span class="text-purple-600 mr-2">•</span>
-                <span><strong>Review carefully:</strong> Check all documents (KTP, NPWP, Verification Doc)</span>
+                <span class="text-green-600 mr-2">•</span>
+                <span><strong>Dua jalur persetujuan:</strong> lolos validasi AI otomatis (skor tinggi), atau disetujui admin setelah peninjauan manual</span>
             </li>
             <li class="flex items-start">
-                <span class="text-purple-600 mr-2">•</span>
-                <span><strong>AI Notes:</strong> Read AI validation notes for specific concerns</span>
-            </li>
-            <li class="flex items-start">
-                <span class="text-purple-600 mr-2">•</span>
-                <span><strong>Final Decision:</strong> Approve if documents are legitimate, reject if suspicious</span>
+                <span class="text-green-600 mr-2">•</span>
+                <span><strong>Lihat Detail:</strong> buka halaman review untuk melihat dokumen dan riwayat validasi AI</span>
             </li>
         </ul>
     </div>
