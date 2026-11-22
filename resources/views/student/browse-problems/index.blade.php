@@ -127,7 +127,7 @@
                             @foreach (['list' => ['Daftar', 'layout-list'], 'grid' => ['Galeri', 'layout-grid'], 'map' => ['Peta', 'map']] as $viewId => [$viewLabel, $viewIcon])
                                 <button type="button" role="tab" class="kb-browse-views__tab" data-view="{{ $viewId }}"
                                         id="browse-{{ $viewId }}-tab" aria-controls="browse-{{ $viewId }}-panel"
-                                        aria-selected="{{ $viewId === 'list' ? 'true' : 'false' }}" tabindex="{{ $viewId === 'list' ? '0' : '-1' }}"
+                                        aria-selected="{{ $viewId === 'grid' ? 'true' : 'false' }}" tabindex="{{ $viewId === 'grid' ? '0' : '-1' }}"
                                         :aria-selected="(view === '{{ $viewId }}').toString()" :tabindex="view === '{{ $viewId }}' ? 0 : -1"
                                         @click="select('{{ $viewId }}')">
                                     <x-icon :name="$viewIcon" size="sm" />{{ $viewLabel }}
@@ -153,7 +153,7 @@
                 @else
                     <h2 class="sr-only">Hasil</h2>
 
-                    <div role="tabpanel" id="browse-list-panel" aria-labelledby="browse-list-tab" x-show="view === 'list'">
+                    <div role="tabpanel" id="browse-list-panel" aria-labelledby="browse-list-tab" x-show="view === 'list'" x-cloak>
                         @if ($problems->isEmpty())
                             @include('student.browse-problems.components.page-empty')
                         @else
@@ -161,7 +161,7 @@
                         @endif
                     </div>
 
-                    <div role="tabpanel" id="browse-grid-panel" aria-labelledby="browse-grid-tab" x-show="view === 'grid'" x-cloak>
+                    <div role="tabpanel" id="browse-grid-panel" aria-labelledby="browse-grid-tab" x-show="view === 'grid'">
                         @if ($problems->isEmpty())
                             @include('student.browse-problems.components.page-empty')
                         @else
@@ -190,22 +190,22 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 document.addEventListener('alpine:init', () => {
-    // tampilan daftar / galeri / peta. state di ?view= (nilai lama 'grid' = galeri) dan localStorage; default daftar
+    // tampilan daftar / galeri / peta. state di ?view= (nilai lama 'grid' = galeri) dan localStorage; default galeri (kunci simpanan baru: pilihan lama 'daftar' tidak lagi memaksa tampilan)
     Alpine.data('kbBrowseView', () => ({
-        view: 'list',
+        view: 'grid',
         views: ['list', 'grid', 'map'],
         init() {
             let saved = null;
-            try { saved = localStorage.getItem('kbBrowseView'); } catch (e) {}
+            try { saved = localStorage.getItem('kbBrowseViewV2'); } catch (e) {}
             const fromUrl = new URLSearchParams(window.location.search).get('view');
-            this.select([fromUrl, saved].find((v) => this.views.includes(v)) || 'list');
+            this.select([fromUrl, saved].find((v) => this.views.includes(v)) || 'grid');
         },
         select(view) {
             this.view = view;
-            try { localStorage.setItem('kbBrowseView', view); } catch (e) {}
+            try { localStorage.setItem('kbBrowseViewV2', view); } catch (e) {}
             const keep = (href) => {
                 const url = new URL(href, window.location.href);
-                if (view === 'list') url.searchParams.delete('view'); else url.searchParams.set('view', view);
+                if (view === 'grid') url.searchParams.delete('view'); else url.searchParams.set('view', view);
                 return url.toString();
             };
             window.history.replaceState(null, '', keep(window.location.href));
@@ -214,7 +214,7 @@ document.addEventListener('alpine:init', () => {
                 if (new URL(a.href).pathname.replace(/\/$/, '') === '/student/browse-problems') a.href = keep(a.href);
             });
             const input = document.getElementById('browse-view-input');
-            if (input) { input.value = view; input.disabled = view === 'list'; }
+            if (input) { input.value = view; input.disabled = view === 'grid'; }
             if (view === 'map') this.$nextTick(() => window.dispatchEvent(new CustomEvent('mapViewActivated')));
         },
         onKeydown(e) {

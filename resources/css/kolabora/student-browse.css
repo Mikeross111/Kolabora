@@ -112,9 +112,27 @@
 .kb-browse-table th[aria-sort] .kb-browse-table__sort { color: var(--kb-text-link); font-weight: 600; }
 
 /* ── Gallery (optional): cards, media only when a real image loads (x-ui.card) ── */
-.kb-browse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.kb-browse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
 .kb-browse-grid > li { display: flex; min-width: 0; }
 .kb-browse-card { width: 100%; }
+.kb-pcard { position: relative; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--kb-surface-raised); border: 1px solid var(--kb-border-default); border-radius: var(--kb-radius-panel); transition: box-shadow var(--duration-state) var(--ease-standard), border-color var(--duration-state) var(--ease-standard), transform var(--duration-state) var(--ease-standard); }
+.kb-pcard:hover, .kb-pcard:focus-within { box-shadow: var(--shadow-card); border-color: var(--color-brand-200); transform: translateY(-2px); }
+.kb-pcard__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--color-brand-50) url('/assets/illustrations/motifs/contour-field.svg') center / cover no-repeat; }
+.kb-pcard__media img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s var(--ease-standard); }
+.kb-pcard:hover .kb-pcard__media img { transform: scale(1.04); }
+.kb-pcard__badges { position: absolute; top: .625rem; left: .625rem; z-index: 1; display: flex; flex-wrap: wrap; gap: .375rem; margin: 0; }
+.kb-pcard__badge { display: inline-flex; align-items: center; gap: .25rem; padding: .1875rem .5rem; font: 600 .75rem/1rem var(--font-sans); color: var(--kb-text-primary); background: var(--kb-surface-raised); border-radius: 999px; box-shadow: 0 1px 2px rgb(16 48 80 / .18); }
+.kb-pcard__body { display: grid; gap: .5rem; align-content: start; flex: 1; padding: 1rem; }
+.kb-pcard__title { margin: 0; font-size: 1.0625rem; line-height: 1.5rem; overflow-wrap: anywhere; }
+.kb-pcard__link { color: var(--kb-text-primary); text-decoration: none; }
+.kb-pcard__link::after { content: ''; position: absolute; inset: 0; z-index: 0; }
+.kb-pcard__link:hover { color: var(--kb-text-link); }
+.kb-pcard__link:focus-visible { outline: none; }
+.kb-pcard:has(.kb-pcard__link:focus-visible) { outline: 2px solid var(--kb-focus); outline-offset: 2px; }
+.kb-pcard__status { margin: 0; }
+.kb-pcard__where { display: flex; align-items: center; gap: .375rem; margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); }
+.kb-pcard__left { color: var(--kb-text-secondary); }
+@media (prefers-reduced-motion: reduce) { .kb-pcard, .kb-pcard__media img { transition: none; } .kb-pcard:hover, .kb-pcard:focus-within { transform: none; } .kb-pcard:hover .kb-pcard__media img { transform: none; } }
 .kb-browse-card .kb-card__title { overflow-wrap: anywhere; }
 .kb-browse-card .kb-card__title a { display: inline-block; min-height: 1.5rem; }
 .kb-browse-card__by { margin: 0; font-size: .875rem; line-height: 1.25rem; color: var(--kb-text-secondary); overflow-wrap: anywhere; }

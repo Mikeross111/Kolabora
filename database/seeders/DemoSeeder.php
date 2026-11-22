@@ -21,6 +21,12 @@ class DemoSeeder extends Seeder
 
     private Carbon $now;
 
+    /** @var array<string, string[]> foto per folder tema */
+    private array $library = [];
+
+    /** @var array<string, bool> foto yang sudah dipakai sebagai sampul, supaya tidak berulang */
+    private array $usedPhotos = [];
+
     public function run(): void
     {
         mt_srand(2026);
@@ -28,6 +34,7 @@ class DemoSeeder extends Seeder
 
         if (DB::table('users')->where('email', 'admin@kolabora.test')->exists()) {
             if (DB::table('problems')->count() >= 30) {
+                $this->refreshPhotos();
                 return;
             }
             $this->purge();
@@ -74,6 +81,82 @@ class DemoSeeder extends Seeder
             'name' => $name, 'email' => $email, 'username' => $username, 'password' => $hash, 'user_type' => $type,
             'is_active' => true, 'email_verified_at' => $at, 'created_at' => $at, 'updated_at' => $at,
         ]);
+    }
+
+    // ───────────────────────── foto ─────────────────────────
+
+    private function themeFromSdg(array $sdg): string
+    {
+        $first = (int) ($sdg[0] ?? 0);
+
+        return match (true) {
+            in_array($first, [1, 2, 15], true) => 'pertanian',
+            $first === 14 => 'pesisir',
+            in_array($first, [4, 5, 10], true) => 'pendidikan',
+            in_array($first, [8, 12, 17], true) => 'pasar',
+            in_array($first, [9, 16], true) => 'desa',
+            default => 'komunitas',
+        };
+    }
+
+    private function photosIn(string $dir): array
+    {
+        if (! isset($this->library[$dir])) {
+            $sub = in_array($dir, ['field', 'about', 'homepage'], true) ? $dir : "library/$dir";
+            $files = glob(public_path("assets/photography/$sub/*.webp")) ?: [];
+            sort($files);
+            if ($dir === 'field') {
+                $files = array_values(array_filter($files, fn ($f) => str_ends_with($f, '-800.webp')));
+            }
+            $this->library[$dir] = array_map(fn ($f) => "assets/photography/$sub/" . basename($f), $files);
+        }
+
+        return $this->library[$dir];
+    }
+
+    /** foto sampul yang belum terpakai, dimulai dari tema yang cocok; jika semua terpakai, pilihan berputar */
+    private function pickPhoto(string $theme, bool $cover): string
+    {
+        $order = array_values(array_unique(array_merge([$theme], match ($theme) {
+            'komunitas' => ['field', 'desa', 'pendidikan'],
+            'desa' => ['komunitas', 'field', 'homepage', 'about'],
+            'pertanian' => ['about', 'homepage', 'desa'],
+            'pesisir' => ['homepage', 'desa'],
+            'pasar' => ['komunitas', 'desa'],
+            default => ['komunitas', 'desa'],
+        }, ['field', 'komunitas', 'desa', 'pendidikan', 'pertanian', 'pesisir', 'pasar', 'homepage', 'about'])));
+
+        foreach ($order as $dir) {
+            foreach ($this->photosIn($dir) as $path) {
+                if (! isset($this->usedPhotos[$path])) {
+                    if ($cover) {
+                        $this->usedPhotos[$path] = true;
+                    }
+
+                    return $path;
+                }
+            }
+        }
+
+        $all = $this->photosIn($theme) ?: $this->photosIn('komunitas');
+
+        return $all[count($this->usedPhotos) % max(1, count($all))] ?? 'assets/photography/field/kkn-itb-2025-mahasiswa-jalan-desa-800.webp';
+    }
+
+    /** data demo yang sudah ada: bagikan ulang foto supaya tiap masalah punya sampul berbeda. tidak menyentuh data lain */
+    private function refreshPhotos(): void
+    {
+        $covers = DB::table('problem_images')->where('is_cover', true)->where('image_path', 'like', 'assets/photography/%')->distinct()->count('image_path');
+        if ($covers >= 30) {
+            return;
+        }
+        foreach (DB::table('problems')->orderBy('id')->get(['id', 'sdg_categories']) as $p) {
+            $rows = DB::table('problem_images')->where('problem_id', $p->id)->where('image_path', 'like', 'assets/photography/%')->orderBy('order')->get(['id']);
+            $theme = $this->themeFromSdg((array) json_decode((string) $p->sdg_categories, true));
+            foreach ($rows as $i => $row) {
+                DB::table('problem_images')->where('id', $row->id)->update(['image_path' => $this->pickPhoto($theme, $i === 0)]);
+            }
+        }
     }
 
     // ───────────────────────── pengguna ─────────────────────────
@@ -199,14 +282,6 @@ class DemoSeeder extends Seeder
 
     private function seedProblemsAndActivity(array &$u): void
     {
-        $photoDirs = ['pertanian' => 'pertanian', 'pesisir' => 'pesisir', 'pasar' => 'pasar', 'pendidikan' => 'pendidikan', 'desa' => 'desa', 'komunitas' => 'komunitas'];
-        $photos = [];
-        foreach ($photoDirs as $k => $d) {
-            $files = glob(public_path("assets/photography/library/$d/*.webp")) ?: [];
-            sort($files);
-            $photos[$k] = array_map(fn ($f) => "assets/photography/library/$d/" . basename($f), $files);
-        }
-
         // [instansi, judul, SDG, skill, tema foto, dokumen (hanya selesai)]
         $completed = [
             [0, 'Digitalisasi arsip desa dan layanan surat online', [16, 9], ['Laravel', 'Basis Data'], 'desa', 'laporan-arsip-desa'],
@@ -273,7 +348,7 @@ class DemoSeeder extends Seeder
             ['Akses ke data instansi', 'Ruang pertemuan dan peralatan dasar', 'Sertifikat dan surat keterangan selesai program']];
         $deliv = [['Laporan awal dan rencana kerja', 'Laporan mingguan', 'Laporan akhir dan serah terima'], ['Dokumentasi kegiatan', 'Materi atau modul yang dapat dipakai ulang', 'Laporan akhir']];
 
-        $mkProblem = function (array $d, string $status, int $idx) use (&$u, $photos, $bg, $obj, $fac, $deliv) {
+        $mkProblem = function (array $d, string $status, int $idx) use (&$u, $bg, $obj, $fac, $deliv) {
             [$ii, $title, $sdg, $skills, $theme] = $d;
             $inst = $u['institutions'][$ii];
             $created = $status === 'open' ? $this->ago(28, 1) : $this->ago(30, 26);
@@ -296,17 +371,14 @@ class DemoSeeder extends Seeder
                 'is_featured' => $status === 'open' && $idx < 4, 'is_urgent' => $status === 'open' && $idx % 9 === 4,
                 'created_at' => $created, 'updated_at' => $created,
             ]);
-            $files = $photos[$theme] ?? [];
-            if ($files) {
-                foreach ([0, 1, 2] as $n) {
-                    if ($n && ($idx + $n) % 3 === 0) {
-                        continue;
-                    }
-                    DB::table('problem_images')->insert([
-                        'problem_id' => $pid, 'image_path' => $files[($idx + $n) % count($files)], 'caption' => $n === 0 ? 'Kondisi lapangan' : 'Dokumentasi pendukung',
-                        'order' => $n, 'is_cover' => $n === 0, 'created_at' => $created, 'updated_at' => $created,
-                    ]);
+            foreach ([0, 1, 2] as $n) {
+                if ($n && ($idx + $n) % 3 === 0) {
+                    continue;
                 }
+                DB::table('problem_images')->insert([
+                    'problem_id' => $pid, 'image_path' => $this->pickPhoto($theme, $n === 0), 'caption' => $n === 0 ? 'Kondisi lapangan' : 'Dokumentasi pendukung',
+                    'order' => $n, 'is_cover' => $n === 0, 'created_at' => $created, 'updated_at' => $created,
+                ]);
             }
             return ['id' => $pid, 'inst' => $inst, 'title' => $title, 'sdg' => $sdg, 'start' => $start, 'end' => $end, 'created' => $created];
         };

@@ -86,9 +86,11 @@ class StudentBrowseProblemsTest extends TestCase
         $this->assertStringContainsString('Telusuri Masalah', $main);
         $this->assertMatchesRegularExpression('/<b>3<\/b>\s*masalah dibuka/', $main);
 
-        // tabel sebagai default; tab daftar terpilih di html awal
+        // galeri sebagai tampilan awal (kartu berfoto); tabel tetap tersedia lewat tab daftar
         $this->assertStringContainsString('<table class="kb-table kb-table--stack">', $main);
-        $this->assertMatchesRegularExpression('/data-view="list"[^>]*aria-selected="true"/s', $main);
+        $this->assertStringContainsString('class="kb-browse-grid"', $main);
+        $this->assertMatchesRegularExpression('/data-view="grid"[^>]*aria-selected="true"/s', $main);
+        $this->assertMatchesRegularExpression('/data-view="list"[^>]*aria-selected="false"/s', $main);
         foreach (['Masalah', 'Instansi', 'Lokasi', 'Kuota', 'Kesulitan'] as $column) {
             $this->assertStringContainsString('<th scope="col">'.$column.'</th>', $main);
         }
