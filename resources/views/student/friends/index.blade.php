@@ -60,6 +60,14 @@
                                 <x-slot:leading>
                                     <x-ui.avatar :src="$photoOf($friend)" :name="$friend->display_name" />
                                 </x-slot:leading>
+                                @if (isset($friendshipIds[$friend->id]))
+                                    <form method="POST" action="{{ route('student.friends.unfriend', $friendshipIds[$friend->id]) }}" class="mt-3"
+                                          onsubmit="return confirm('Hapus koneksi dengan {{ e($friend->display_name) }}?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <x-ui.button type="submit" variant="tertiary" aria-label="Hapus koneksi dengan {{ $friend->display_name }}">Hapus koneksi</x-ui.button>
+                                    </form>
+                                @endif
                             </x-ui.list-item>
                         @endforeach
                     </x-ui.list>
@@ -121,11 +129,24 @@
                                   description="Permintaan koneksi dari mahasiswa lain akan muncul di sini." />
             @endif
 
-            @if ($stats['sent_requests'] > 0)
-                <p class="mt-4 mb-0 text-sm text-gray-700 tabular-nums">
-                    <x-icon name="hourglass" size="sm" class="text-gray-500" />
-                    {{ $fmt($stats['sent_requests']) }} permintaan yang Anda kirim masih menunggu jawaban.
-                </p>
+            @if ($sentRequests->count() > 0)
+                <h3 class="mt-6 mb-2 text-base font-semibold text-gray-900">Permintaan yang Anda kirim</h3>
+                <x-ui.list label="Permintaan koneksi terkirim">
+                    @foreach ($sentRequests as $sent)
+                        @php $target = $sent->receiver; @endphp
+                        @continue(! $target)
+                        <x-ui.list-item :title="$target->display_name" :href="route('profile.public', $target->user->username)" :meta="$metaOf($target)">
+                            <x-slot:leading>
+                                <x-ui.avatar :src="$photoOf($target)" :name="$target->display_name" />
+                            </x-slot:leading>
+                            <form method="POST" action="{{ route('student.friends.cancel', $sent->id) }}" class="mt-3">
+                                @csrf
+                                @method('DELETE')
+                                <x-ui.button type="submit" variant="tertiary" aria-label="Batalkan permintaan ke {{ $target->display_name }}">Batalkan permintaan</x-ui.button>
+                            </form>
+                        </x-ui.list-item>
+                    @endforeach
+                </x-ui.list>
             @endif
         </x-ui.tab-panel>
 

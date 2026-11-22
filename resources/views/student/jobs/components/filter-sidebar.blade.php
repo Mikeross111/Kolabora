@@ -13,9 +13,6 @@
     @if (filled(request('location')))
         <input type="hidden" name="location" value="{{ request('location') }}">
     @endif
-    @foreach ($selectedTypes as $type)
-        <input type="hidden" name="job_type[]" value="{{ $type }}">
-    @endforeach
     @if (filled(request('salary_min')))
         <input type="hidden" name="salary_min" value="{{ request('salary_min') }}">
     @endif
@@ -33,6 +30,24 @@
             <x-ui.select name="category" id="filter-category" :options="$categories->pluck('name', 'id')->all()"
                          :selected="request('category')" placeholder="Semua bidang" />
         </x-ui.field>
+
+        {{-- tipe pekerjaan: pilihan ganda, ikut terkirim sebagai job_type[] --}}
+        @php
+            $typeOptions = ['internship' => 'Magang', 'full_time' => 'Penuh waktu', 'part_time' => 'Paruh waktu', 'contract' => 'Kontrak', 'freelance' => 'Lepas'];
+            $typeChecked = array_map('strtolower', $selectedTypes);
+            if (in_array('magang', $typeChecked, true)) { $typeChecked[] = 'internship'; }
+        @endphp
+        <fieldset class="kb-browse-filters__details">
+            <legend class="kb-label">Tipe pekerjaan</legend>
+            <div class="grid pt-1">
+                @foreach ($typeOptions as $value => $label)
+                    <label class="kb-check py-1.5" for="filter-type-{{ $value }}">
+                        <input type="checkbox" name="job_type[]" id="filter-type-{{ $value }}" value="{{ $value }}" @checked(in_array($value, $typeChecked, true))>
+                        <span>{{ $label }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </fieldset>
 
         {{-- tujuan SDG: 17 nama bahasa indonesia + swatch warna resmi; label terlihat dan tertaut ke input.
              target: seluruh baris label (>= 32px tinggi; 44px pada layar sentuh lewat .kb-check) --}}

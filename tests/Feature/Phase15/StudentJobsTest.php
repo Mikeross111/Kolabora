@@ -147,7 +147,8 @@ class StudentJobsTest extends TestCase
 
         // parameter tanpa kontrol tetap ikut terkirim; chip bisa menghapus satu per satu
         $this->assertStringContainsString('<input type="hidden" name="location" value="Bandung">', $html);
-        $this->assertStringContainsString('<input type="hidden" name="job_type[]" value="Internship">', $html);
+        // tipe lowongan kini punya kotak centang yang terlihat; nilai lama 'Internship' tetap terbaca (tanpa memandang huruf besar) dan tercentang
+        $this->assertMatchesRegularExpression('/id="filter-type-internship" value="internship" checked/', $html);
         $this->assertStringContainsString('<input type="hidden" name="salary_min" value="500000">', $html);
         $this->assertStringContainsString('Bidang: Pemberdayaan UMKM', $html);
         $this->assertStringContainsString('Lokasi: Bandung', $html);

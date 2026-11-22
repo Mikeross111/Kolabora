@@ -65,12 +65,22 @@ class FriendController extends Controller
         // rekomendasi teman
         $suggestions = $student->suggestedFriends(8);
 
+        // id pertemanan per mahasiswa (untuk tombol hapus koneksi) dan permintaan terkirim (untuk tombol batalkan)
+        $friendshipIds = \App\Models\Friend::where('status', 'accepted')
+            ->where(fn ($q) => $q->where('requester_id', $student->id)->orWhere('receiver_id', $student->id))
+            ->get()
+            ->mapWithKeys(fn ($f) => [($f->requester_id === $student->id ? $f->receiver_id : $f->requester_id) => $f->id]);
+        $sentRequests = \App\Models\Friend::with('receiver.user', 'receiver.university')
+            ->where('requester_id', $student->id)->where('status', 'pending')->latest()->get();
+
         return view('student.friends.index', compact(
             'student',
             'friends',
             'pendingRequests',
             'suggestions',
-            'stats'
+            'stats',
+            'friendshipIds',
+            'sentRequests'
         ));
     }
 

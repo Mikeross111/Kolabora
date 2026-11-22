@@ -16,6 +16,25 @@
 @endphp
 
 @section('content')
+    @php $pct = (int) ($completeness['percentage'] ?? 100); $todo = (array) ($completeness['suggestions'] ?? []); @endphp
+    @if ($pct < 100)
+        <div class="kb-container">
+            <section class="kb-dash-project__progress" aria-labelledby="judul-kelengkapan" style="display:grid; gap:.5rem; margin:1rem 0 0; padding:1rem; background:var(--kb-surface-raised); border:1px solid var(--kb-border-default); border-radius:var(--kb-radius-panel);">
+                <h2 id="judul-kelengkapan" style="margin:0; font-size:1rem; line-height:1.5rem;">Kelengkapan profil</h2>
+                <div style="display:flex; align-items:center; gap:.75rem;">
+                    <progress max="100" value="{{ $pct }}" aria-label="Kelengkapan profil" style="flex:1;">{{ $pct }}%</progress>
+                    <strong>{{ $pct }}%</strong>
+                </div>
+                @if (count($todo))
+                    <ul style="margin:0; padding-left:1.25rem;">
+                        @foreach ($todo as $tip)<li>{{ $tip }}</li>@endforeach
+                    </ul>
+                @endif
+                <p style="margin:0;"><a href="{{ route('student.profile.edit') }}">Lengkapi profil</a></p>
+            </section>
+        </div>
+    @endif
+
     @include('student.profile.components.portfolio', [
         'projects' => $completedProjects,
         'owner' => true,

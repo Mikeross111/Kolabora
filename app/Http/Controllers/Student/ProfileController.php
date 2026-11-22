@@ -55,8 +55,11 @@ class ProfileController extends Controller
         // ambil data portfolio
         $portfolioData = $this->portfolioService->getPortfolioData($student->id);
 
+        // kelengkapan profil (hitungan yang sama dengan endpoint completeness)
+        $completeness = $this->getCompleteness()->getData(true);
+
         return view('student.profile.index', array_merge(
-            compact('user', 'student', 'stats'),
+            compact('user', 'student', 'stats', 'completeness'),
             $portfolioData
         ));
     }

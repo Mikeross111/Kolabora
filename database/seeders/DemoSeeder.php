@@ -147,6 +147,9 @@ class DemoSeeder extends Seeder
     /** lowongan demo lama menyimpan daftar sebagai JSON; aplikasi memakai teks biasa satu baris per butir */
     private function refreshJobText(): void
     {
+        DB::table('job_postings')->where('job_type', 'full-time')->update(['job_type' => 'full_time']);
+        DB::table('job_postings')->where('job_type', 'part-time')->update(['job_type' => 'part_time']);
+
         foreach (DB::table('job_postings')->get(['id', 'responsibilities', 'qualifications', 'benefits']) as $row) {
             $update = [];
             foreach (['responsibilities', 'qualifications', 'benefits'] as $col) {
@@ -551,29 +554,29 @@ class DemoSeeder extends Seeder
         $cats = DB::table('job_categories')->orderBy('id')->pluck('id')->all();
         $jobs = [
             [0, 'Pengembang Web Junior (Magang)', 'internship', ['Laravel', 'Basis Data', 'Git'], 'Membangun dan merawat aplikasi layanan publik berbasis web bersama tim produk.'],
-            [0, 'Analis Data Program Sosial', 'full-time', ['Analisis Data', 'Excel', 'Visualisasi'], 'Mengolah data lapangan program pemberdayaan menjadi laporan dampak yang mudah dipahami.'],
+            [0, 'Analis Data Program Sosial', 'full_time', ['Analisis Data', 'Excel', 'Visualisasi'], 'Mengolah data lapangan program pemberdayaan menjadi laporan dampak yang mudah dipahami.'],
             [0, 'Desainer UI/UX Aplikasi Desa', 'contract', ['UI/UX', 'Figma', 'Riset Pengguna'], 'Merancang antarmuka aplikasi untuk pengguna dengan literasi digital beragam.'],
-            [0, 'Penulis Konten Edukasi Digital', 'part-time', ['Penulisan', 'Penyuntingan'], 'Menulis materi edukasi untuk pelatihan literasi digital warga.'],
-            [1, 'Asisten Agronomi Lapangan', 'full-time', ['Pendampingan', 'Survei Lapangan'], 'Mendampingi kelompok tani dalam budidaya dan pencatatan hasil panen.'],
+            [0, 'Penulis Konten Edukasi Digital', 'part_time', ['Penulisan', 'Penyuntingan'], 'Menulis materi edukasi untuk pelatihan literasi digital warga.'],
+            [1, 'Asisten Agronomi Lapangan', 'full_time', ['Pendampingan', 'Survei Lapangan'], 'Mendampingi kelompok tani dalam budidaya dan pencatatan hasil panen.'],
             [1, 'Analis Data Pertanian', 'internship', ['Analisis Data', 'GIS'], 'Menganalisis data cuaca dan hasil panen untuk rekomendasi tanam.'],
             [1, 'Fasilitator Koperasi Tani', 'contract', ['Pendampingan', 'Akuntansi Dasar'], 'Melatih pengurus koperasi dalam pembukuan dan perencanaan usaha.'],
-            [2, 'Teknisi Lapangan Panel Surya', 'full-time', ['Survei Lapangan', 'Teknik Listrik'], 'Memasang dan merawat sistem surya untuk dusun terpencil.'],
-            [2, 'Staf Edukasi Energi Bersih', 'part-time', ['Edukasi', 'Public Speaking'], 'Memberi penyuluhan hemat energi di sekolah dan balai desa.'],
+            [2, 'Teknisi Lapangan Panel Surya', 'full_time', ['Survei Lapangan', 'Teknik Listrik'], 'Memasang dan merawat sistem surya untuk dusun terpencil.'],
+            [2, 'Staf Edukasi Energi Bersih', 'part_time', ['Edukasi', 'Public Speaking'], 'Memberi penyuluhan hemat energi di sekolah dan balai desa.'],
             [2, 'Analis Studi Kelayakan Energi', 'internship', ['Analisis Data', 'GIS'], 'Menyiapkan studi kelayakan lokasi pembangkit skala kecil.'],
-            [3, 'Pengembang Konten Pembelajaran', 'full-time', ['Desain Modul', 'Mengajar'], 'Menyusun modul belajar bergambar untuk sekolah dasar di daerah.'],
+            [3, 'Pengembang Konten Pembelajaran', 'full_time', ['Desain Modul', 'Mengajar'], 'Menyusun modul belajar bergambar untuk sekolah dasar di daerah.'],
             [3, 'Fasilitator Pelatihan Guru', 'contract', ['Mengajar', 'Public Speaking'], 'Melatih guru memakai media belajar digital sederhana.'],
             [3, 'Desainer Grafis Pendidikan', 'internship', ['Desain Grafis', 'UI/UX'], 'Membuat ilustrasi dan tata letak materi ajar.'],
-            [4, 'Penyuluh Kesehatan Masyarakat', 'full-time', ['Edukasi', 'Pendampingan'], 'Menjalankan penyuluhan gizi dan kesehatan ibu di desa binaan.'],
+            [4, 'Penyuluh Kesehatan Masyarakat', 'full_time', ['Edukasi', 'Pendampingan'], 'Menjalankan penyuluhan gizi dan kesehatan ibu di desa binaan.'],
             [4, 'Analis Data Kesehatan Komunitas', 'internship', ['Analisis Data', 'Survei Lapangan'], 'Mengolah data posyandu dan puskesmas menjadi laporan bulanan.'],
             [4, 'Pengembang Aplikasi Pencatatan Kesehatan', 'contract', ['Laravel', 'UI/UX'], 'Mengembangkan aplikasi pencatatan kesehatan untuk kader.'],
-            [5, 'Konsultan Pengelolaan Sampah', 'full-time', ['Pengelolaan Sampah', 'Survei Lapangan'], 'Menyusun rencana pengelolaan sampah untuk pemerintah daerah.'],
+            [5, 'Konsultan Pengelolaan Sampah', 'full_time', ['Pengelolaan Sampah', 'Survei Lapangan'], 'Menyusun rencana pengelolaan sampah untuk pemerintah daerah.'],
             [5, 'Staf Pemantauan Lingkungan', 'internship', ['GIS', 'Analisis Data'], 'Memantau kualitas air dan tutupan lahan di wilayah proyek.'],
-            [5, 'Fasilitator Pendidikan Lingkungan', 'part-time', ['Edukasi', 'Public Speaking'], 'Memandu kegiatan pendidikan lingkungan di sekolah.'],
-            [6, 'Staf Rantai Pasok Pangan Lokal', 'full-time', ['Analisis Data', 'Pemasaran Digital'], 'Mengatur alur pasok hasil tani lokal ke pasar kota.'],
+            [5, 'Fasilitator Pendidikan Lingkungan', 'part_time', ['Edukasi', 'Public Speaking'], 'Memandu kegiatan pendidikan lingkungan di sekolah.'],
+            [6, 'Staf Rantai Pasok Pangan Lokal', 'full_time', ['Analisis Data', 'Pemasaran Digital'], 'Mengatur alur pasok hasil tani lokal ke pasar kota.'],
             [6, 'Analis Logistik Magang', 'internship', ['Analisis Data', 'Excel'], 'Menghitung biaya dan waktu pengiriman hasil panen.'],
-            [7, 'Koordinator Program Pemberdayaan Desa', 'full-time', ['Pendampingan', 'Penulisan'], 'Mengoordinasikan program pendampingan di beberapa desa mitra.'],
+            [7, 'Koordinator Program Pemberdayaan Desa', 'full_time', ['Pendampingan', 'Penulisan'], 'Mengoordinasikan program pendampingan di beberapa desa mitra.'],
             [7, 'Staf Pemantauan dan Evaluasi', 'contract', ['Analisis Data', 'Penulisan'], 'Menyusun indikator dan laporan dampak program.'],
-            [7, 'Relawan Profesional Dokumentasi', 'part-time', ['Fotografi', 'Penulisan'], 'Mendokumentasikan kegiatan program untuk laporan dan publikasi.'],
+            [7, 'Relawan Profesional Dokumentasi', 'part_time', ['Fotografi', 'Penulisan'], 'Mendokumentasikan kegiatan program untuk laporan dan publikasi.'],
             [1, 'Pemasar Digital Produk Tani', 'internship', ['Pemasaran Digital', 'Fotografi'], 'Mengelola katalog daring produk kelompok tani.'],
             [3, 'Pengembang Game Edukasi', 'contract', ['Desain Modul', 'Laravel'], 'Membuat permainan belajar ringan untuk anak sekolah dasar.'],
         ];
@@ -634,7 +637,7 @@ Jam kerja fleksibel", 'skills' => json_encode($skills), 'sdg_alignment' => json_
         }
         DB::table('job_alerts')->insert([
             ['user_id' => $studentUsers[0], 'name' => 'Magang teknologi', 'keywords' => 'web, laravel, data', 'job_types' => json_encode(['internship']), 'locations' => json_encode(['Bandung']), 'skills' => json_encode(['Laravel']), 'frequency' => 'weekly', 'is_active' => true, 'created_at' => $this->ago(12), 'updated_at' => $this->ago(12)],
-            ['user_id' => $studentUsers[0], 'name' => 'Pendidikan dan kesehatan', 'keywords' => 'edukasi, kesehatan', 'job_types' => json_encode(['full-time', 'part-time']), 'locations' => json_encode([]), 'skills' => json_encode(['Edukasi']), 'frequency' => 'daily', 'is_active' => true, 'created_at' => $this->ago(9), 'updated_at' => $this->ago(9)],
+            ['user_id' => $studentUsers[0], 'name' => 'Pendidikan dan kesehatan', 'keywords' => 'edukasi, kesehatan', 'job_types' => json_encode(['full_time', 'part_time']), 'locations' => json_encode([]), 'skills' => json_encode(['Edukasi']), 'frequency' => 'daily', 'is_active' => true, 'created_at' => $this->ago(9), 'updated_at' => $this->ago(9)],
         ]);
         foreach ([0, 1, 2, 3, 4, 6, 9] as $s) {
             DB::table('saved_talents')->insert(['company_id' => $u['companies'][0]['id'], 'user_id' => $studentUsers[$s], 'category' => ['Teknologi', 'Data', 'Desain'][$s % 3], 'notes' => 'Pengalaman KKN relevan.', 'saved_at' => $this->ago(10), 'created_at' => $this->ago(10), 'updated_at' => $this->ago(10)]);
