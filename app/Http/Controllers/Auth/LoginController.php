@@ -177,6 +177,14 @@ class LoginController extends Controller
                 ]);
                 break;
 
+            case 'admin':
+                $route = route('admin.dashboard');
+                Log::info('Redirecting to admin dashboard', [
+                    'user_id' => $user->id,
+                    'route' => $route,
+                ]);
+                break;
+
             default:
                 Log::error('Invalid user type', [
                     'user_id' => $user->id,
