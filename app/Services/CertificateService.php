@@ -83,6 +83,10 @@ class CertificateService
                 unlink($imagePath);
             }
 
+            if (!$uploadedPath) {
+                throw new \Exception('Gagal mengunggah sertifikat ke penyimpanan');
+            }
+
             // Update project dengan info sertifikat
             $fullCertificateNumber = "{$certificateNumber}/KKN/MHS/KOLABORA/XI/{$certificateYear}";
             $project->update([
