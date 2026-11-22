@@ -35,6 +35,7 @@ class DemoSeeder extends Seeder
         if (DB::table('users')->where('email', 'admin@kolabora.test')->exists()) {
             if (DB::table('problems')->count() >= 30) {
                 $this->refreshPhotos();
+                $this->refreshJobText();
                 return;
             }
             $this->purge();
@@ -141,6 +142,27 @@ class DemoSeeder extends Seeder
         $all = $this->photosIn($theme) ?: $this->photosIn('komunitas');
 
         return $all[count($this->usedPhotos) % max(1, count($all))] ?? 'assets/photography/field/kkn-itb-2025-mahasiswa-jalan-desa-800.webp';
+    }
+
+    /** lowongan demo lama menyimpan daftar sebagai JSON; aplikasi memakai teks biasa satu baris per butir */
+    private function refreshJobText(): void
+    {
+        foreach (DB::table('job_postings')->get(['id', 'responsibilities', 'qualifications', 'benefits']) as $row) {
+            $update = [];
+            foreach (['responsibilities', 'qualifications', 'benefits'] as $col) {
+                $v = $row->{$col};
+                if (is_string($v) && str_starts_with(ltrim($v), '[')) {
+                    $list = json_decode($v, true);
+                    if (is_array($list)) {
+                        $update[$col] = implode("
+", array_map('strval', $list));
+                    }
+                }
+            }
+            if ($update) {
+                DB::table('job_postings')->where('id', $row->id)->update($update);
+            }
+        }
     }
 
     /** data demo yang sudah ada: bagikan ulang foto supaya tiap masalah punya sampul berbeda. tidak menyentuh data lain */
@@ -566,9 +588,15 @@ class DemoSeeder extends Seeder
                 'company_id' => $co['id'], 'job_category_id' => $cats ? $cats[$i % count($cats)] : null, 'title' => $title,
                 'slug' => 'demo-' . ($i + 1) . '-' . Str::slug($title), 'department' => 'Program', 'location' => ['Bandung', 'Yogyakarta', 'Semarang', 'Surabaya', 'Jakarta', 'Bogor', 'Malang', 'Cirebon'][$ci],
                 'job_type' => $type, 'salary_min' => $min, 'salary_max' => $min + 2500000, 'salary_currency' => 'IDR', 'salary_period' => 'monthly', 'description' => $desc,
-                'responsibilities' => json_encode(['Bekerja dalam tim lintas fungsi', 'Menyampaikan hasil kerja secara berkala', 'Berkoordinasi dengan mitra lapangan']),
-                'qualifications' => json_encode(['Mahasiswa tingkat akhir atau lulusan baru', 'Pernah mengikuti KKN atau proyek komunitas', 'Mampu bekerja mandiri dan dalam tim']),
-                'benefits' => json_encode(['Mentoring', 'Sertifikat', 'Jam kerja fleksibel']), 'skills' => json_encode($skills), 'sdg_alignment' => json_encode([8, 9]),
+                'responsibilities' => "Bekerja dalam tim lintas fungsi
+Menyampaikan hasil kerja secara berkala
+Berkoordinasi dengan mitra lapangan",
+                'qualifications' => "Mahasiswa tingkat akhir atau lulusan baru
+Pernah mengikuti KKN atau proyek komunitas
+Mampu bekerja mandiri dan dalam tim",
+                'benefits' => "Mentoring
+Sertifikat
+Jam kerja fleksibel", 'skills' => json_encode($skills), 'sdg_alignment' => json_encode([8, 9]),
                 'required_sdgs' => json_encode([8, 9]), 'status' => $status, 'allow_guest_applications' => false, 'views_count' => 30 + ($i * 19) % 280,
                 'applications_count' => 0, 'published_at' => $status === 'draft' ? null : $pub, 'expires_at' => $status === 'closed' ? $this->now->copy()->subDays(2) : $this->now->copy()->addDays(20 + $i % 25),
                 'created_at' => $pub, 'updated_at' => $pub,

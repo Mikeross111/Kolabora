@@ -231,7 +231,7 @@ class Project extends Model
         }
         
         $days = now()->diffInDays($this->end_date, false);
-        return max(0, ceil($days));
+        return (int) max(0, ceil($days));
     }
 
     /**
@@ -275,8 +275,8 @@ class Project extends Model
      */
     public function calculateCompletionPercentage()
     {
-        $totalDays = $this->start_date->diffInDays($this->end_date);
-        $elapsedDays = $this->start_date->diffInDays(now());
+        $totalDays = (int) $this->start_date->diffInDays($this->end_date);
+        $elapsedDays = (int) $this->start_date->diffInDays(now());
         
         if ($totalDays <= 0) {
             return 100;

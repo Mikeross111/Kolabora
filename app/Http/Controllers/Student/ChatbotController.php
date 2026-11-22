@@ -122,7 +122,9 @@ class ChatbotController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak valid.',
+                'message' => isset($e->errors()['message'])
+                    ? 'Pesan tidak valid: kosong atau lebih dari 5000 karakter. Persingkat pesan Anda lalu kirim lagi.'
+                    : 'Data tidak valid.',
                 'errors' => $e->errors()
             ], 422);
 

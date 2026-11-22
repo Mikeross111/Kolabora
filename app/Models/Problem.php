@@ -194,7 +194,7 @@ class Problem extends Model
             return 0;
         }
         
-        return max(0, now()->diffInDays($this->application_deadline, false));
+        return (int) max(0, ceil(now()->diffInDays($this->application_deadline, false)));
     }
 
     /**

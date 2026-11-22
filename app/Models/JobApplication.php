@@ -252,7 +252,7 @@ class JobApplication extends Model
      */
     public function getDaysSinceAppliedAttribute()
     {
-        return $this->created_at->diffInDays(now());
+        return (int) $this->created_at->diffInDays(now());
     }
 
     /**

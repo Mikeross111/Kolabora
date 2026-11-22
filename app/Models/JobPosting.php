@@ -224,7 +224,7 @@ class JobPosting extends Model
             return null;
         }
 
-        return $this->published_at->diffInDays(now());
+        return (int) $this->published_at->diffInDays(now());
     }
 
     /**

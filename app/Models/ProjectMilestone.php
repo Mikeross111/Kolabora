@@ -114,7 +114,7 @@ class ProjectMilestone extends Model
         }
         
         $days = now()->diffInDays($this->target_date, false);
-        return max(0, $days);
+        return (int) max(0, ceil($days));
     }
 
     /**

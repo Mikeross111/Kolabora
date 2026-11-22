@@ -180,7 +180,7 @@
                                 @if($job->expires_at)
                                 <span class="{{ $job->expires_at->lt(now()->addDays(7)) ? 'text-red-600 font-medium' : 'text-gray-700' }}">
                                     {{ $job->expires_at->format('d M Y') }}
-                                    ({{ $job->expires_at->diffForHumans() }})
+                                    ({{ $job->expires_at->locale('id')->diffForHumans() }})
                                 </span>
                                 @else
                                 <span class="text-gray-400">Tidak ada batas</span>

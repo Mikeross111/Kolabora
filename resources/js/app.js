@@ -33,3 +33,22 @@ ready(() => {
         import('./kolabora/charts').then(({ initCharts }) => initCharts());
     }
 });
+
+// pesan validasi bawaan browser mengikuti bahasa browser (sering Inggris); ganti dengan bahasa Indonesia
+document.addEventListener('invalid', (e) => {
+    const el = e.target;
+    if (!el || typeof el.setCustomValidity !== 'function') return;
+    const v = el.validity;
+    let msg = '';
+    if (v.valueMissing) msg = el.type === 'checkbox' ? 'Centang kotak ini untuk melanjutkan.' : (el.tagName === 'SELECT' ? 'Pilih salah satu opsi.' : 'Kolom ini wajib diisi.');
+    else if (v.typeMismatch) msg = el.type === 'email' ? 'Masukkan alamat email yang valid.' : (el.type === 'url' ? 'Masukkan alamat web yang valid.' : 'Format isian tidak sesuai.');
+    else if (v.tooShort) msg = 'Isian terlalu pendek, minimal ' + el.minLength + ' karakter.';
+    else if (v.tooLong) msg = 'Isian terlalu panjang, maksimal ' + el.maxLength + ' karakter.';
+    else if (v.patternMismatch) msg = el.title || 'Format isian tidak sesuai.';
+    else if (v.rangeUnderflow) msg = 'Nilai terlalu kecil, minimal ' + el.min + '.';
+    else if (v.rangeOverflow) msg = 'Nilai terlalu besar, maksimal ' + el.max + '.';
+    el.setCustomValidity(msg);
+}, true);
+document.addEventListener('input', (e) => {
+    if (e.target && typeof e.target.setCustomValidity === 'function') e.target.setCustomValidity('');
+}, true);

@@ -158,6 +158,6 @@ class ProjectReport extends Model
             return 0;
         }
         
-        return $this->period_start->diffInDays($this->period_end);
+        return (int) $this->period_start->diffInDays($this->period_end);
     }
 }

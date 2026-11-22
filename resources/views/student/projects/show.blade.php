@@ -134,6 +134,22 @@
                 @endif
             </section>
 
+            @if ($project->status === 'completed' && ($project->rating || filled($project->institution_review) || $project->certificate_path))
+                @php $stars = max(0, min(5, (int) $project->rating)); @endphp
+                <section class="kb-inst-detail__block" aria-labelledby="judul-ulasan">
+                    <h2 id="judul-ulasan">Ulasan dan sertifikat</h2>
+                    @if ($stars)
+                        <p class="kb-inst-detail__text"><strong>{{ $stars }} dari 5</strong> <span aria-hidden="true">{{ str_repeat('★', $stars) }}{{ str_repeat('☆', 5 - $stars) }}</span></p>
+                    @endif
+                    @if (filled($project->institution_review))
+                        <div class="kb-inst-detail__text">{!! nl2br(e($project->institution_review)) !!}</div>
+                    @endif
+                    @if ($project->certificate_path)
+                        <p><a href="{{ document_url($project->certificate_path) }}" target="_blank" download class="kb-btn kb-btn--secondary"><x-icon name="download" size="sm" />Unduh sertifikat</a></p>
+                    @endif
+                </section>
+            @endif
+
             @if (filled($project->description))
                 <section class="kb-inst-detail__block">
                     <h2>Deskripsi</h2>
