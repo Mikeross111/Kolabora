@@ -115,10 +115,6 @@ php artisan test
 
 Antarmuka digerakkan token desain (satu sumber kebenaran) dengan bahasa visual yang diturunkan dari logo: teal sebagai warna utama, oranye sebagai aksen, navy untuk teks. Token ada di `resources/css/kolabora/tokens.css`, komponen `.kb-*` di `components.css`, dan gaya per halaman di berkas CSS bernama sesuai halamannya. Semua pasangan warna teks diuji kontrasnya (WCAG AA), dan audit aksesibilitas otomatis (axe-core) pada halaman kunci tanpa pelanggaran kontras.
 
-## Penggunaan AI Coding Assistant
-
-Asisten kode berbasis AI (**Claude Code**, Anthropic) digunakan selama pengembangan untuk: refaktor dan penyeragaman tampilan (sistem desain, palet, komponen), pembersihan kode dan penamaan, penulisan dan perbaikan test, serta penyusunan dokumentasi ini. Seluruh keluaran ditinjau dan diuji oleh pemilik repositori (`php artisan test`, `npm run build`, pemeriksaan visual) sebelum digabungkan.
-
 AI sebagai **fitur produk** (Kora, verifikasi dokumen, saran proyek) dijelaskan di bagian [Integrasi AI](#integrasi-ai).
 
 ## Deklarasi Pihak Ketiga
